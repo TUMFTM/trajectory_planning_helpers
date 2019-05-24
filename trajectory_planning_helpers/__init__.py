@@ -10,3 +10,5 @@ import trajectory_planning_helpers.import_ggv
 import trajectory_planning_helpers.calc_ax_profile
 import trajectory_planning_helpers.angle3pt
 import trajectory_planning_helpers.progressbar
+import trajectory_planning_helpers.calc_vel_profile
+import trajectory_planning_helpers.calc_vel_profile_brake

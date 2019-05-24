@@ -9,6 +9,8 @@
 * `import_ggv`: Import the ggv diagram containing vehicle handling limits from a text file.
 * `calc_ax_profile`: Calculate the longitudinal acceleration profile for a given velocity profile.
 * `calc_t_profile`: Calculate the temporal duration profile for a given velocity profile.
+* `calc_vel_profile`: Calculate velocity profile on the basis of a forward/backward solver.
+* `calc_vel_profile_brake`: Calculate velocity profile on the basis of a pure forward solver.
 
 Contact person: [Alexander Heilmeier](mailto:alexander.heilmeier@tum.de).
 
