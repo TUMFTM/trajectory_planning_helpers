@@ -11,3 +11,8 @@
 * `calc_t_profile`: Calculate the temporal duration profile for a given velocity profile.
 
 Contact person: [Alexander Heilmeier](mailto:alexander.heilmeier@tum.de).
+
+# List of components
+* `angle3pt`: Calculates angle by turning from a to c around b.
+
+Contact person: [Tim Stahl](mailto:stahl@ftm.mw.tum.de).
