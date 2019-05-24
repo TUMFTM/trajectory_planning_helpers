@@ -9,3 +9,4 @@ import path_planning_helpers.calc_t_profile
 import path_planning_helpers.import_ggv
 import path_planning_helpers.calc_ax_profile
 import path_planning_helpers.angle3pt
+import path_planning_helpers.progressbar

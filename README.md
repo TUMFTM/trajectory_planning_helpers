@@ -14,5 +14,6 @@ Contact person: [Alexander Heilmeier](mailto:alexander.heilmeier@tum.de).
 
 # List of components
 * `angle3pt`: Calculates angle by turning from a to c around b.
+* `progressbar`: Commandline progressbar (to be called in a for loop).
 
 Contact person: [Tim Stahl](mailto:stahl@ftm.mw.tum.de).
