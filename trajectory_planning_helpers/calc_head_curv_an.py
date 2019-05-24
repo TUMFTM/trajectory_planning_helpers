@@ -1,5 +1,5 @@
 import numpy as np
-import path_planning_helpers.normalize_psi
+import trajectory_planning_helpers.normalize_psi
 
 
 def calc_head_curv_an(coeffs_x: np.ndarray, coeffs_y: np.ndarray, ind_spls: np.ndarray, t_spls: np.ndarray) -> tuple:
@@ -35,7 +35,7 @@ def calc_head_curv_an(coeffs_x: np.ndarray, coeffs_y: np.ndarray, ind_spls: np.n
 
     # calculate heading psi (pi/2 must be substracted due to our convention that psi = 0 is north)
     psi = np.arctan2(y_d, x_d) - np.pi / 2
-    psi = path_planning_helpers.normalize_psi.normalize_psi(psi)
+    psi = trajectory_planning_helpers.normalize_psi.normalize_psi(psi)
 
     # calculate curvature kappa
     kappa = (x_d * y_dd - y_d * x_dd) / np.power(np.power(x_d, 2) + np.power(y_d, 2), 1.5)

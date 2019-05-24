@@ -1,5 +1,5 @@
 import numpy as np
-import path_planning_helpers.calc_ax_profile
+import trajectory_planning_helpers.calc_ax_profile
 
 
 def calc_t_profile(vx_profile: np.ndarray, el_lengths: np.ndarray, t_start: float = 0.0,
@@ -25,8 +25,8 @@ def calc_t_profile(vx_profile: np.ndarray, el_lengths: np.ndarray, t_start: floa
             raise ValueError("Array size of vx_profile should be 1 element bigger than el_lengths!")
 
         else:
-            ax_profile = path_planning_helpers.calc_ax_profile.calc_ax_profile(vx_profile=vx_profile,
-                                                                               el_lengths=el_lengths)
+            ax_profile = trajectory_planning_helpers.calc_ax_profile.calc_ax_profile(vx_profile=vx_profile,
+                                                                                     el_lengths=el_lengths)
 
     # calculate temporal duration of every step between two points
     no_points = np.size(el_lengths)

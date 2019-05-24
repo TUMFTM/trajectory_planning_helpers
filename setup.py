@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='trajectory-planning-helpers',
-    version='0.15',
+    version='0.16',
     author="Alexander Heilmeier",
     author_email="alexander.heilmeier@tum.de",
     description="Useful functions used for path and trajectory planning at TUM/FTM",

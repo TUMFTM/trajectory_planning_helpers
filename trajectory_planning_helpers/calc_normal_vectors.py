@@ -1,5 +1,5 @@
 import numpy as np
-import path_planning_helpers.normalize_psi
+import trajectory_planning_helpers.normalize_psi
 
 
 def calc_normal_vectors(psi_vel: np.ndarray) -> np.ndarray:
@@ -22,7 +22,7 @@ def calc_normal_vectors(psi_vel: np.ndarray) -> np.ndarray:
 
     # remap psi_vel to x-axis
     psi_vel_ -= np.pi / 2
-    psi_vel_ = path_planning_helpers.normalize_psi.normalize_psi(psi_vel_)
+    psi_vel_ = trajectory_planning_helpers.normalize_psi.normalize_psi(psi_vel_)
 
     # inverse atan2
     tangvec = np.ones((psi_vel_.size, 2))
