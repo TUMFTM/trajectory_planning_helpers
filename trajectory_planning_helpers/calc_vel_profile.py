@@ -37,7 +37,7 @@ def calc_vel_profile(ggv: np.ndarray, kappa: np.ndarray, el_lengths: np.ndarray,
     # ------------------------------------------------------------------------------------------------------------------
 
     # transform curvature kappa into corresponding radii (abs because curvature has a sign in our convention)
-    radii = np.abs(np.divide(1, kappa, out=np.full(kappa.size, np.inf), where=kappa != 0))
+    radii = np.abs(np.divide(1.0, kappa, out=np.full(kappa.size, np.inf), where=kappa != 0.0))
 
     # set mu to one in case it is not set
     if mu is None:
@@ -71,10 +71,15 @@ def calc_vel_profile(ggv: np.ndarray, kappa: np.ndarray, el_lengths: np.ndarray,
         if not filt_window % 2 == 1:
             raise IOError("Window width of moving average filter in velocity profile generation must be odd!")
 
-        # apply filter
-        vx_profile = np.convolve(vx_profile,
+        # calculate half window width - 1
+        w_window_half = int((filt_window - 1) / 2)
+
+        # apply filter (temporarily add points in front and behind and remove them after filter application)
+        vx_profile_tmp = np.concatenate((vx_profile[-w_window_half:], vx_profile, vx_profile[:w_window_half]), axis=0)
+
+        vx_profile = np.convolve(vx_profile_tmp,
                                  np.ones(filt_window) / float(filt_window),
-                                 mode="same")
+                                 mode="same")[w_window_half:-w_window_half]
 
     return vx_profile
 
