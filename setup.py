@@ -1,11 +1,17 @@
 import setuptools
 
+"""
+Package on pypi.org can be updated with the following commands:
+python3 setup.py sdist bdist_wheel
+sudo python3 -m twine upload dist/*
+"""
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name='trajectory-planning-helpers',
-    version='0.18',
+    version='0.19',
     author="Alexander Heilmeier, Tim Stahl",
     author_email="alexander.heilmeier@tum.de, stahl@ftm.mw.tum.de",
     description="Useful functions used for path and trajectory planning at TUM/FTM",
