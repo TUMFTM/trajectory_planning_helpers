@@ -12,3 +12,5 @@ import trajectory_planning_helpers.angle3pt
 import trajectory_planning_helpers.progressbar
 import trajectory_planning_helpers.calc_vel_profile
 import trajectory_planning_helpers.calc_vel_profile_brake
+import trajectory_planning_helpers.spline_approximation
+import trajectory_planning_helpers.side_of_line

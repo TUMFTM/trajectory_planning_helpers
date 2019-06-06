@@ -11,6 +11,7 @@
 * `calc_t_profile`: Calculate the temporal duration profile for a given velocity profile.
 * `calc_vel_profile`: Calculate velocity profile on the basis of a forward/backward solver.
 * `calc_vel_profile_brake`: Calculate velocity profile on the basis of a pure forward solver.
+* `side_of_line`: Function determines if a point is on the left or right side of a line.
 
 Contact person: [Alexander Heilmeier](mailto:alexander.heilmeier@tum.de).
 
@@ -19,3 +20,10 @@ Contact person: [Alexander Heilmeier](mailto:alexander.heilmeier@tum.de).
 * `progressbar`: Commandline progressbar (to be called in a for loop).
 
 Contact person: [Tim Stahl](mailto:stahl@ftm.mw.tum.de).
+
+# List of components
+* `spline_approximation`: Function used to obtain a smoothed track on the basis of a spline approximation.
+
+Author: Fabian Christ
+
+Contact person: [Alexander Heilmeier](mailto:alexander.heilmeier@tum.de).
