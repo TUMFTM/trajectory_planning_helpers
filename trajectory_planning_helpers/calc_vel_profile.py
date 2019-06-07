@@ -1,4 +1,5 @@
 import numpy as np
+import trajectory_planning_helpers.filt_vel_profile
 
 
 def calc_vel_profile(ggv: np.ndarray, kappa: np.ndarray, el_lengths: np.ndarray, closed: bool,
@@ -65,46 +66,9 @@ def calc_vel_profile(ggv: np.ndarray, kappa: np.ndarray, el_lengths: np.ndarray,
     # ------------------------------------------------------------------------------------------------------------------
 
     if filt_window is not None:
-
-        # check if window width is odd
-        if not filt_window % 2 == 1:
-            raise IOError("Window width of moving average filter in velocity profile generation must be odd!")
-
-        # calculate half window width - 1
-        w_window_half = int((filt_window - 1) / 2)
-
-        # apply filter
-        if closed:
-            # temporarily add points in front and behind and remove them after filter application
-            vx_profile_tmp = np.concatenate((vx_profile[-w_window_half:], vx_profile, vx_profile[:w_window_half]),
-                                            axis=0)
-
-            # convolution filter used as a moving average filter
-            vx_profile = np.convolve(vx_profile_tmp,
-                                     np.ones(filt_window) / float(filt_window),
-                                     mode="same")[w_window_half:-w_window_half]
-
-        else:
-            # unclosed profile -> boundaries must be handled differently
-
-            # implementation 1: include boundaries during filtering
-            # vx_profile_tmp = np.copy(vx_profile)
-            # no_points = vx_profile.size
-            #
-            # for i in range(no_points):
-            #     if i < w_window_half:
-            #         vx_profile[i] = np.average(vx_profile_tmp[:i + w_window_half + 1])
-            #
-            #     elif i < no_points - w_window_half:
-            #         vx_profile[i] = np.average(vx_profile_tmp[i - w_window_half:i + w_window_half + 1])
-            #
-            #     else:
-            #         vx_profile[i] = np.average(vx_profile_tmp[i - w_window_half:])
-
-            # implementation 2: start filtering at w_window_half and stop at -w_window_half
-            vx_profile[w_window_half:-w_window_half] = np.convolve(vx_profile,
-                                                                   np.ones(filt_window) / float(filt_window),
-                                                                   mode="same")[w_window_half:-w_window_half]
+        vx_profile = trajectory_planning_helpers.filt_vel_profile.filt_vel_profile(v_profile=vx_profile,
+                                                                                   filt_window=filt_window,
+                                                                                   closed=closed)
 
     return vx_profile
 
