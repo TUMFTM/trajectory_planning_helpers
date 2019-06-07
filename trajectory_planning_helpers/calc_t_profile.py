@@ -21,15 +21,12 @@ def calc_t_profile(vx_profile: np.ndarray, el_lengths: np.ndarray, t_start: floa
 
     # calculate acceleration profile if required (len(ax_profile) == len(vx_profile) - 1)
     if ax_profile is None:
-        if vx_profile.size != el_lengths.size + 1:
-            raise ValueError("Array size of vx_profile should be 1 element bigger than el_lengths!")
-
-        else:
-            ax_profile = trajectory_planning_helpers.calc_ax_profile.calc_ax_profile(vx_profile=vx_profile,
-                                                                                     el_lengths=el_lengths)
+        ax_profile = trajectory_planning_helpers.calc_ax_profile.calc_ax_profile(vx_profile=vx_profile,
+                                                                                 el_lengths=el_lengths,
+                                                                                 eq_length_output=False)
 
     # calculate temporal duration of every step between two points
-    no_points = np.size(el_lengths)
+    no_points = el_lengths.size
     t_steps = np.zeros(no_points)
 
     for i in range(no_points):
