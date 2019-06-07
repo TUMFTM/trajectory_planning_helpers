@@ -110,7 +110,7 @@ def calc_vel_profile(ggv: np.ndarray, kappa: np.ndarray, el_lengths: np.ndarray,
 
 
 def solver_fb_unclosed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarray, mu: np.ndarray, v_start: float,
-                       v_end: float, tire_model_exp: float = 2.0) -> np.ndarray:
+                       v_end: float = None, tire_model_exp: float = 2.0) -> np.ndarray:
 
     # ------------------------------------------------------------------------------------------------------------------
     # FORWARD BACKWARD SOLVER ------------------------------------------------------------------------------------------
@@ -145,7 +145,7 @@ def solver_fb_unclosed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarra
                                        tire_model_exp=tire_model_exp)
 
     # consider v_end
-    if vx_profile[-1] > v_end:
+    if v_end is not None and vx_profile[-1] > v_end:
         vx_profile[-1] = v_end
 
     # calculate deceleration profile
