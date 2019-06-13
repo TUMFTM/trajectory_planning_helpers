@@ -8,7 +8,7 @@
 * `calc_t_profile`: Calculate the temporal duration profile for a given velocity profile.
 * `calc_vel_profile`: Calculate velocity profile on the basis of a forward/backward solver.
 * `calc_vel_profile_brake`: Calculate velocity profile on the basis of a pure forward solver.
-* `filt_vel_profile`: Filter a given velocity profile using a moving average filter.
+* `conv_filt`: Filter a given signal using a 1D convolution (moving average) filter.
 * `import_ggv`: Import the ggv diagram containing vehicle handling limits from a text file.
 * `interp_splines`: Interpolate splines to get points with a desired stepsize.
 * `normalize_psi`: Normalize heading psi such that the interval [-pi, pi[ holds.
