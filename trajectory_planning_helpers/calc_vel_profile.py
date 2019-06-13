@@ -1,5 +1,5 @@
 import numpy as np
-import trajectory_planning_helpers.filt_vel_profile
+import trajectory_planning_helpers.conv_filt
 
 
 def calc_vel_profile(ggv: np.ndarray,
@@ -72,9 +72,9 @@ def calc_vel_profile(ggv: np.ndarray,
     # ------------------------------------------------------------------------------------------------------------------
 
     if filt_window is not None:
-        vx_profile = trajectory_planning_helpers.filt_vel_profile.filt_vel_profile(v_profile=vx_profile,
-                                                                                   filt_window=filt_window,
-                                                                                   closed=closed)
+        vx_profile = trajectory_planning_helpers.conv_filt.conv_filt(signal=vx_profile,
+                                                                     filt_window=filt_window,
+                                                                     closed=closed)
 
     return vx_profile
 
