@@ -55,7 +55,7 @@ def calc_splines(path: np.ndarray,
         el_lengths = np.sqrt(np.sum(np.power(np.diff(path, axis=0), 2), axis=1))
 
     # get number of splines
-    no_splines = el_lengths.size
+    no_splines = path.shape[0] - 1
 
     # calculate scaling factors between every pair of splines
     if use_dist_scaling:
