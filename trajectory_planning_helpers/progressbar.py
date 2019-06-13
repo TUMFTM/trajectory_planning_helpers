@@ -1,7 +1,12 @@
 import sys
 
 
-def progressbar(i: int, i_total: int, prefix: str = '', suffix: str = '', decimals: int = 1, length: int = 50) -> None:
+def progressbar(i: int,
+                i_total: int,
+                prefix: str = '',
+                suffix: str = '',
+                decimals: int = 1,
+                length: int = 50) -> None:
     """
     Created by:
     Tim Stahl

@@ -1,8 +1,12 @@
 import numpy as np
+import trajectory_planning_helpers as tph
 
 
-def interp_splines(spline_lengths: np.ndarray, coeffs_x: np.ndarray, coeffs_y: np.ndarray,
-                   incl_last_point: bool = False, stepsize_approx: float = 1.0) -> tuple:
+def interp_splines(coeffs_x: np.ndarray,
+                   coeffs_y: np.ndarray,
+                   spline_lengths: np.ndarray = None,
+                   incl_last_point: bool = False,
+                   stepsize_approx: float = 1.0) -> tuple:
     """
     Created by:
     Alexander Heilmeier
@@ -13,9 +17,9 @@ def interp_splines(spline_lengths: np.ndarray, coeffs_x: np.ndarray, coeffs_y: n
     ws_track can be inserted optionally and should contain [w_tr_right, w_tr_left].
 
     Inputs:
-    spline_lengths: array containing the lengths of the inserted splines with size no_splines x 1.
     coeffs_x: coefficient matrix of the x splines with size no_splines x 4.
     coeffs_y: coefficient matrix of the y splines with size no_splines x 4.
+    spline_lengths: array containing the lengths of the inserted splines with size no_splines x 1.
     incl_last_point: flag to set if last point should be kept or removed before return.
     stepsize_approx: desired stepsize of the points after interpolation.
     """
@@ -29,6 +33,11 @@ def interp_splines(spline_lengths: np.ndarray, coeffs_x: np.ndarray, coeffs_y: n
         raise ValueError("Coefficient matrices do not have two dimensions!")
 
     # get the total distance up to the end of every spline (i.e. cumulated distances)
+    if spline_lengths is None:
+        spline_lengths = tph.calc_spline_lengths.calc_spline_lengths(coeffs_x=coeffs_x,
+                                                                     coeffs_y=coeffs_y,
+                                                                     quickndirty=False)
+
     dists_cum = np.cumsum(spline_lengths)
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -73,20 +82,17 @@ def interp_splines(spline_lengths: np.ndarray, coeffs_x: np.ndarray, coeffs_y: n
                                 + coeffs_y[j, 3] * np.power(t_values[i], 3)
 
     # ------------------------------------------------------------------------------------------------------------------
-    # CALCULATE LAST POINT (t = 1.0) -----------------------------------------------------------------------------------
+    # CALCULATE LAST POINT IF REQUIRED (t = 1.0) -----------------------------------------------------------------------
     # ------------------------------------------------------------------------------------------------------------------
 
-    t_values[-1] = 1.0
+    if incl_last_point:
+        t_values[-1] = 1.0
 
-    raceline_interp[-1, 0] = coeffs_x[j, 0] + coeffs_x[j, 1] + coeffs_x[j, 2] + coeffs_x[j, 3]
-    raceline_interp[-1, 1] = coeffs_y[j, 0] + coeffs_y[j, 1] + coeffs_y[j, 2] + coeffs_y[j, 3]
+        raceline_interp[-1, 0] = coeffs_x[j, 0] + coeffs_x[j, 1] + coeffs_x[j, 2] + coeffs_x[j, 3]
+        raceline_interp[-1, 1] = coeffs_y[j, 0] + coeffs_y[j, 1] + coeffs_y[j, 2] + coeffs_y[j, 3]
 
-    # ------------------------------------------------------------------------------------------------------------------
-    # POST PROCESSING --------------------------------------------------------------------------------------------------
-    # ------------------------------------------------------------------------------------------------------------------
-
-    if not incl_last_point:
-        raceline_interp = raceline_interp[:-1, :]
+    else:
+        raceline_interp = raceline_interp[:-1]
         spline_inds = spline_inds[:-1]
         t_values = t_values[:-1]
         dists_interp = dists_interp[:-1]

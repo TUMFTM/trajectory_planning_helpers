@@ -1,7 +1,9 @@
 import numpy as np
 
 
-def calc_spline_lengths(coeffs_x: np.ndarray, coeffs_y: np.ndarray, quickndirty: bool = False,
+def calc_spline_lengths(coeffs_x: np.ndarray,
+                        coeffs_y: np.ndarray,
+                        quickndirty: bool = False,
                         no_interp_points: int = 15) -> np.ndarray:
     """
     Created by:

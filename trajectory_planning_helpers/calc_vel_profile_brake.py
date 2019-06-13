@@ -1,8 +1,13 @@
 import numpy as np
 
 
-def calc_vel_profile_brake(ggv: np.ndarray, kappa: np.ndarray, el_lengths: np.ndarray, v_start: float,
-                           mu: np.ndarray = None, decel_max: float = None, tire_model_exp: float = 2.0) -> np.ndarray:
+def calc_vel_profile_brake(ggv: np.ndarray,
+                           kappa: np.ndarray,
+                           el_lengths: np.ndarray,
+                           v_start: float,
+                           mu: np.ndarray = None,
+                           decel_max: float = None,
+                           tire_model_exp: float = 2.0) -> np.ndarray:
     """
     Created by:
     Alexander Heilmeier

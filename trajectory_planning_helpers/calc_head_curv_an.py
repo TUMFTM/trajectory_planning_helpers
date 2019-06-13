@@ -2,7 +2,10 @@ import numpy as np
 import trajectory_planning_helpers.normalize_psi
 
 
-def calc_head_curv_an(coeffs_x: np.ndarray, coeffs_y: np.ndarray, ind_spls: np.ndarray, t_spls: np.ndarray) -> tuple:
+def calc_head_curv_an(coeffs_x: np.ndarray,
+                      coeffs_y: np.ndarray,
+                      ind_spls: np.ndarray,
+                      t_spls: np.ndarray) -> tuple:
     """
     Created by:
     Alexander Heilmeier

@@ -2,9 +2,15 @@ import numpy as np
 import trajectory_planning_helpers.filt_vel_profile
 
 
-def calc_vel_profile(ggv: np.ndarray, kappa: np.ndarray, el_lengths: np.ndarray, closed: bool,
-                     mu: np.ndarray = None, v_start: float = None, v_end: float = None,
-                     filt_window: int = None, tire_model_exp: float = 2.0) -> np.ndarray:
+def calc_vel_profile(ggv: np.ndarray,
+                     kappa: np.ndarray,
+                     el_lengths: np.ndarray,
+                     closed: bool,
+                     mu: np.ndarray = None,
+                     v_start: float = None,
+                     v_end: float = None,
+                     filt_window: int = None,
+                     tire_model_exp: float = 2.0) -> np.ndarray:
     """
     Created by:
     Alexander Heilmeier

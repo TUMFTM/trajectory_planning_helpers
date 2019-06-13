@@ -1,7 +1,9 @@
 import numpy as np
 
 
-def calc_ax_profile(vx_profile: np.ndarray, el_lengths: np.ndarray, eq_length_output: bool = False) -> np.ndarray:
+def calc_ax_profile(vx_profile: np.ndarray,
+                    el_lengths: np.ndarray,
+                    eq_length_output: bool = False) -> np.ndarray:
     """
     Created by:
     Alexander Heilmeier

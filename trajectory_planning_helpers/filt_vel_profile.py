@@ -1,7 +1,9 @@
 import numpy as np
 
 
-def filt_vel_profile(v_profile: np.ndarray, filt_window: int, closed: bool) -> np.ndarray:
+def filt_vel_profile(v_profile: np.ndarray,
+                     filt_window: int,
+                     closed: bool) -> np.ndarray:
     """
     Created by:
     Alexander Heilmeier

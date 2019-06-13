@@ -2,10 +2,9 @@ import numpy as np
 
 
 def calc_splines(path: np.ndarray,
+                 el_lengths: np.ndarray = None,
                  psi_s: float = None,
                  psi_e: float = None,
-                 dists: np.ndarray = None,
-                 closed: bool = False,
                  use_dist_scaling: bool = True) -> tuple:
     """
     Created by:
@@ -21,10 +20,13 @@ def calc_splines(path: np.ndarray,
                     a * {x; y} = {b_x; b_y}
 
     Input:
-    - path:                 x and y coordinates as the basis for the spline construction
-    - psi_{s,e}:           orientation of the {start, end} point
+    - path:             x and y coordinates as the basis for the spline construction
+    - el_lengths:       distances between path points
+    - psi_{s,e}:        orientation of the {start, end} point
+    - use_dist_scaling: bool flag to indicate if heading and curvature scaling should be performed. This is required
+                        if the distances between the points in the path are not equal.
 
-    All inputs are unclosed!
+    path and el_lengths inputs can either be closed or unclosed, but must be consistent!
 
     Output:
     - x_coeff:              spline coefficients of the x-component
@@ -35,26 +37,29 @@ def calc_splines(path: np.ndarray,
     Coefficient matrices have the form a_i, b_i * t, c_i * t^2, d_i * t^3.
     """
 
-    if closed:
-        path = np.vstack((path, path[0]))
+    # check if path is closed
+    if np.all(np.isclose(path[0], path[-1])):
+        closed = True
     else:
-        if psi_s is None or psi_e is None:
-            raise IOError("Headings must be provided for unclosed spline calculation!")
+        closed = False
+
+    # check inputs
+    if not closed and (psi_s is None or psi_e is None):
+        raise IOError("Headings must be provided for unclosed spline calculation!")
+
+    if el_lengths is not None and path.shape[0] != el_lengths.size + 1:
+        raise IOError("el_lengths input must be one element smaller than path input!")
+
+    # if distances between path coordinates are not provided but required, calculate euclidean distances as el_lengths
+    if use_dist_scaling and el_lengths is None:
+        el_lengths = np.sqrt(np.sum(np.power(np.diff(path, axis=0), 2), axis=1))
 
     # get number of splines
-    no_splines = path.shape[0] - 1
-
-    # if distances between path coordinates not provided, calculate euclidean distances
-    if use_dist_scaling:
-        if dists is None:
-            dists = np.sqrt(np.sum(np.power(np.diff(path, axis=0), 2), axis=1))
-
-        elif closed:
-            dists = np.append(dists, dists[0])
+    no_splines = el_lengths.size
 
     # calculate scaling factors between every pair of splines
     if use_dist_scaling:
-        scaling = dists[:-1] / dists[1:]
+        scaling = el_lengths[:-1] / el_lengths[1:]
     else:
         scaling = np.ones(no_splines - 1)
 
@@ -104,12 +109,22 @@ def calc_splines(path: np.ndarray,
         M[-1, -4:] = [0,  1,  2,  3]  # heading end
 
         # heading start
-        b_x[-2] = np.cos(psi_s + np.pi / 2) * dists[0]
-        b_y[-2] = np.sin(psi_s + np.pi / 2) * dists[0]
+        if el_lengths is None:
+            el_length_s = 1.0
+        else:
+            el_length_s = el_lengths[0]
+
+        b_x[-2] = np.cos(psi_s + np.pi / 2) * el_length_s
+        b_y[-2] = np.sin(psi_s + np.pi / 2) * el_length_s
 
         # heading end
-        b_x[-1] = np.cos(psi_e + np.pi / 2) * dists[-1]
-        b_y[-1] = np.sin(psi_e + np.pi / 2) * dists[-1]
+        if el_lengths is None:
+            el_length_e = 1.0
+        else:
+            el_length_e = el_lengths[-1]
+
+        b_x[-1] = np.cos(psi_e + np.pi / 2) * el_length_e
+        b_y[-1] = np.sin(psi_e + np.pi / 2) * el_length_e
 
     else:
         # gradient boundary conditions (for a closed spline)

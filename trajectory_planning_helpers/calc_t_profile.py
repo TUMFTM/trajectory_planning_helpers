@@ -2,7 +2,9 @@ import numpy as np
 import trajectory_planning_helpers.calc_ax_profile
 
 
-def calc_t_profile(vx_profile: np.ndarray, el_lengths: np.ndarray, t_start: float = 0.0,
+def calc_t_profile(vx_profile: np.ndarray,
+                   el_lengths: np.ndarray,
+                   t_start: float = 0.0,
                    ax_profile=None) -> np.ndarray:
     """
     Created by:

@@ -2,9 +2,13 @@ import numpy as np
 import trajectory_planning_helpers.normalize_psi
 
 
-def calc_head_curv_num(path: np.ndarray, el_lengths: np.ndarray, is_closed: bool,
-                       stepsize_psi_preview: float = 1.0, stepsize_psi_review: float = 1.0,
-                       stepsize_curv_preview: float = 2.0, stepsize_curv_review: float = 2.0,) -> tuple:
+def calc_head_curv_num(path: np.ndarray,
+                       el_lengths: np.ndarray,
+                       is_closed: bool,
+                       stepsize_psi_preview: float = 1.0,
+                       stepsize_psi_review: float = 1.0,
+                       stepsize_curv_preview: float = 2.0,
+                       stepsize_curv_review: float = 2.0,) -> tuple:
     """
     Created by:
     Alexander Heilmeier

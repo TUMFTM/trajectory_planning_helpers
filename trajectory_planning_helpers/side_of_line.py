@@ -1,7 +1,9 @@
 import numpy as np
 
 
-def side_of_line(a: np.ndarray, b: np.ndarray, z: np.ndarray) -> np.ndarray:
+def side_of_line(a: np.ndarray,
+                 b: np.ndarray,
+                 z: np.ndarray) -> np.ndarray:
     """
     Created by:
     Alexander Heilmeier

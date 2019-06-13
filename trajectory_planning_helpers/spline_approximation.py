@@ -5,8 +5,12 @@ import numpy as np
 import trajectory_planning_helpers as tph
 
 
-def spline_approximation(track: np.ndarray, k_reg: int = 3, s_reg: int = 10, stepsize_prep: float = 1.0,
-                         stepsize_reg: float = 3.0, debug: bool = False) -> np.ndarray:
+def spline_approximation(track: np.ndarray,
+                         k_reg: int = 3,
+                         s_reg: int = 10,
+                         stepsize_prep: float = 1.0,
+                         stepsize_reg: float = 3.0,
+                         debug: bool = False) -> np.ndarray:
     """
     Created by:
     Fabian Christ
