@@ -54,6 +54,10 @@ def calc_splines(path: np.ndarray,
     if use_dist_scaling and el_lengths is None:
         el_lengths = np.sqrt(np.sum(np.power(np.diff(path, axis=0), 2), axis=1))
 
+    # if closed and use_dist_scaling active append element length in order to obtain overlapping scaling
+    if use_dist_scaling and closed:
+        el_lengths = np.hstack((el_lengths, el_lengths[0]))
+
     # get number of splines
     no_splines = path.shape[0] - 1
 
