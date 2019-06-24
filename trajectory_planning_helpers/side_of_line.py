@@ -1,9 +1,10 @@
 import numpy as np
+from typing import Union
 
 
-def side_of_line(a: np.ndarray,
-                 b: np.ndarray,
-                 z: np.ndarray) -> np.ndarray:
+def side_of_line(a: Union[tuple, np.ndarray],
+                 b: Union[tuple, np.ndarray],
+                 z: Union[tuple, np.ndarray]) -> float:
     """
     Created by:
     Alexander Heilmeier
@@ -14,10 +15,10 @@ def side_of_line(a: np.ndarray,
     https://stackoverflow.com/questions/1560492/how-to-tell-whether-a-point-is-to-the-right-or-left-side-of-a-line
 
     Inputs:
-    points a, b, z
+    points a, b, z as [x, y].
 
     Outputs:
-    position: 0.0 = on line, 1.0 = left side, -1.0 = right side
+    side: 0.0 = on line, 1.0 = left side, -1.0 = right side.
     """
 
     # calculate side

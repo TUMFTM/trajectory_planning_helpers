@@ -11,7 +11,10 @@ def import_ggv(ggv_import_path: str) -> np.ndarray:
     [vx, ax_max_emotors, ax_max_tires, ax_min_tires, ay_max_tires]
 
     Inputs:
-    Path to the ggv text file.
+    ggv_import_path:    Path to the ggv text file.
+
+    Outputs:
+    ggv:                ggv diagram as np array.
     """
 
     # load ggv

@@ -19,20 +19,21 @@ def calc_splines(path: np.ndarray,
 
                     a * {x; y} = {b_x; b_y}
 
-    Input:
-    - path:             x and y coordinates as the basis for the spline construction
-    - el_lengths:       distances between path points
-    - psi_{s,e}:        orientation of the {start, end} point
-    - use_dist_scaling: bool flag to indicate if heading and curvature scaling should be performed. This is required
-                        if the distances between the points in the path are not equal.
+    Inputs:
+    path:                   x and y coordinates as the basis for the spline construction (closed or unclosed).
+    el_lengths:             distances between path points (closed or unclosed).
+    psi_{s,e}:              orientation of the {start, end} point.
+    use_dist_scaling:       bool flag to indicate if heading and curvature scaling should be performed. This is required
+                            if the distances between the points in the path are not equal.
 
-    path and el_lengths inputs can either be closed or unclosed, but must be consistent!
+    path and el_lengths inputs can either be closed or unclosed, but must be consistent! The function detects
+    automatically if the path was inserted closed.
 
-    Output:
-    - x_coeff:              spline coefficients of the x-component
-    - y_coeff:              spline coefficients of the y-component
-    - M:                    LES coefficients
-    - normvec_normalized:   normalized normal vectors
+    Outputs:
+    x_coeff:                spline coefficients of the x-component.
+    y_coeff:                spline coefficients of the y-component.
+    M:                      LES coefficients.
+    normvec_normalized:     normalized normal vectors.
 
     Coefficient matrices have the form a_i, b_i * t, c_i * t^2, d_i * t^3.
     """
@@ -45,10 +46,10 @@ def calc_splines(path: np.ndarray,
 
     # check inputs
     if not closed and (psi_s is None or psi_e is None):
-        raise IOError("Headings must be provided for unclosed spline calculation!")
+        raise ValueError("Headings must be provided for unclosed spline calculation!")
 
     if el_lengths is not None and path.shape[0] != el_lengths.size + 1:
-        raise IOError("el_lengths input must be one element smaller than path input!")
+        raise ValueError("el_lengths input must be one element smaller than path input!")
 
     # if distances between path coordinates are not provided but required, calculate euclidean distances as el_lengths
     if use_dist_scaling and el_lengths is None:

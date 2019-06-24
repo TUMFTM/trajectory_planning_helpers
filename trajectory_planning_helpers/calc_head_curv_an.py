@@ -15,11 +15,24 @@ def calc_head_curv_an(coeffs_x: np.ndarray,
     y-coordinate.
 
     Inputs:
-    coeffs_x: coefficient matrix of the x splines with size no_splines x 4.
-    coeffs_y: coefficient matrix of the y splines with size no_splines x 4.
-    ind_spls: contains the indices of the splines that hold the points for which we want to calculate heading/curvature.
-    t_spls: containts the relative spline coordinate values (t) of every point on the splines.
+    coeffs_x:   coefficient matrix of the x splines with size (no_splines x 4).
+    coeffs_y:   coefficient matrix of the y splines with size (no_splines x 4).
+    ind_spls:   contains the indices of the splines that hold the points for which we want to calculate heading/curv.
+    t_spls:     containts the relative spline coordinate values (t) of every point on the splines.
+
+    Outputs:
+    psi:        heading at every point.
+    kappa:      curvature at every point.
+
+    len(ind_spls) = len(t_spls) = len(psi) = len(kappa)
     """
+
+    # check inputs
+    if coeffs_x.shape[0] != coeffs_y.shape[0]:
+        raise ValueError("Coefficient matrices must have the same length!")
+
+    if ind_spls.size != t_spls.size:
+        raise ValueError("ind_spls and t_spls must have the same length!")
 
     # calculate required derivatives
     x_d = coeffs_x[ind_spls, 1] \

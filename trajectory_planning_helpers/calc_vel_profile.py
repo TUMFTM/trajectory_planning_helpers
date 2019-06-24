@@ -22,22 +22,38 @@ def calc_vel_profile(ggv: np.ndarray,
     Calculates a velocity profile using the tire and motor limits as good as possible. This function is for
 
     Inputs:
-    ggv:                ggv-diagram to be applied
-    kappa:              curvature profile of given trajectory in rad/m
-    el_lengths:         element lengths (distances between coordinates) of given trajectory
-    closed:             flag to set if the velocity profile must be calculated for a closed or unclosed trajectory
-    mu:                 friction coefficients
-    v_start:            start velocity in m/s (used in unclosed case only)
-    v_end:              end velocity in m/s (used in unclosed case only)
-    filt_window:        filter window size for moving average filter (must be odd)
-    tire_model_exp:     exponent used in the dynamics model
+    ggv:                ggv-diagram to be applied.
+    kappa:              curvature profile of given trajectory in rad/m (always unclosed).
+    el_lengths:         element lengths (distances between coordinates) of given trajectory.
+    closed:             flag to set if the velocity profile must be calculated for a closed or unclosed trajectory.
+    mu:                 friction coefficients (always unclosed).
+    v_start:            start velocity in m/s (used in unclosed case only).
+    v_end:              end velocity in m/s (used in unclosed case only).
+    filt_window:        filter window size for moving average filter (must be odd).
+    tire_model_exp:     exponent used in the dynamics model.
 
-    case closed:
-    len(kappa) = len(el_lengths) = len(mu)
+    All inputs must be inserted unclosed, i.e. kappa[-1] != kappa[0], even if closed is set True! (el_lengths is kind of
+    closed if closed is True of course!)
 
-    case unclosed:
-    len(kappa) = len(el_lengths) + 1 = len(mu)
+    Outputs:
+    vx_profile:         calculated velocity profile (always unclosed).
+
+    case closed is True:
+    len(kappa) = len(el_lengths) = len(mu) = len(vx_profile)
+
+    case closed is False:
+    len(kappa) = len(el_lengths) + 1 = len(mu) = len(vx_profile)
     """
+
+    # check inputs
+    if mu is not None and kappa.size != mu.size:
+        raise ValueError("kappa and mu must have the same length!")
+
+    if closed and kappa.size != el_lengths.size:
+        raise ValueError("kappa and el_lengths must have the same length if closed!")
+
+    elif not closed and kappa.size != el_lengths.size + 1:
+        raise ValueError("kappa must have the length of el_lengths + 1 if unclosed!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # SPEED PROFILE CALCULATION (FB) -----------------------------------------------------------------------------------

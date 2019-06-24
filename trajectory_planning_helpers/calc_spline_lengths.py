@@ -13,15 +13,25 @@ def calc_spline_lengths(coeffs_x: np.ndarray,
     intermediate steps.
 
     Inputs:
-    coeffs_x: coefficient matrix of the x splines with size no_splines x 4.
-    coeffs_y: coefficient matrix of the y splines with size no_splines x 4.
-    quickndirty: flag returns lengths based on distance between first and last spline point.
-    no_interp_points: length calculation is carried out with the given number of interpolation steps.
+    coeffs_x:           coefficient matrix of the x splines with size (no_splines x 4).
+    coeffs_y:           coefficient matrix of the y splines with size (no_splines x 4).
+    quickndirty:        flag returns lengths based on distance between first and last spline point instead of
+                        using interpolation.
+    no_interp_points:   length calculation is carried out with the given number of interpolation steps.
+
+    Outputs:
+    spline_lengths:     length of every spline segment.
+
+    len(coeffs_x) = len(coeffs_y) = len(spline_lengths)
     """
 
     # ------------------------------------------------------------------------------------------------------------------
     # PREPARATIONS -----------------------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------------------------------------
+
+    # check inputs
+    if coeffs_x.shape[0] != coeffs_y.shape[0]:
+        raise ValueError("Coefficient matrices must have the same length!")
 
     # catch case with only one spline
     if coeffs_x.size == 4 and coeffs_x.shape[0] == 4:

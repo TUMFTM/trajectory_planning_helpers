@@ -18,17 +18,33 @@ def interp_splines(coeffs_x: np.ndarray,
     ws_track can be inserted optionally and should contain [w_tr_right, w_tr_left].
 
     Inputs:
-    coeffs_x:           coefficient matrix of the x splines with size no_splines x 4.
-    coeffs_y:           coefficient matrix of the y splines with size no_splines x 4.
-    spline_lengths:     array containing the lengths of the inserted splines with size no_splines x 1.
+    coeffs_x:           coefficient matrix of the x splines with size (no_splines x 4).
+    coeffs_y:           coefficient matrix of the y splines with size (no_splines x 4).
+    spline_lengths:     array containing the lengths of the inserted splines with size (no_splines x 1).
     incl_last_point:    flag to set if last point should be kept or removed before return.
     stepsize_approx:    desired stepsize of the points after interpolation.                          \\ Provide only one
     stepnum_fixed:      return a fixed number of coordinates per spline, list of length no_splines.  \\ of these two!
+
+    Outputs:
+    path_interp:        interpolated path points.
+    spline_inds:        contains the indices of the splines that hold the interpolated points.
+    t_values:           containts the relative spline coordinate values (t) of every point on the splines.
+    dists_interp:       total distance up to every interpolation point.
+
+    len(coeffs_x) = len(coeffs_y) = len(spline_lengths)
+    len(path_interp = len(spline_inds) = len(t_values) = len(dists_interp)
     """
 
     # ------------------------------------------------------------------------------------------------------------------
     # INPUT CHECKS -----------------------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------------------------------------
+
+    # check sizes
+    if coeffs_x.shape[0] != coeffs_y.shape[0]:
+        raise ValueError("Coefficient matrices must have the same length!")
+
+    if coeffs_x.shape[0] != spline_lengths.size:
+        raise ValueError("coeffs_x and spline_lengths must have the same length!")
 
     # check if coeffs_x and coeffs_y have exactly two dimensions and raise error otherwise
     if not (coeffs_x.ndim == 2 and coeffs_y.ndim == 2):

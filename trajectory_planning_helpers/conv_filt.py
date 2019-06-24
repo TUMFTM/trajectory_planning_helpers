@@ -15,16 +15,21 @@ def conv_filt(signal: np.ndarray,
     Filter a given temporal signal using a convolution (moving average) filter.
 
     Inputs:
-    signal:         temporal signal that should be filtered
-    filt_window:    filter window size for moving average filter (must be odd)
-    closed:         flag showing if the signal can be considered as closable, e.g. for velocity profiles
+    signal:         temporal signal that should be filtered (always unclosed).
+    filt_window:    filter window size for moving average filter (must be odd).
+    closed:         flag showing if the signal can be considered as closable, e.g. for velocity profiles.
 
     signal input is always unclosed!
+
+    Outputs:
+    signal_filt:    filtered input signal (always unclosed).
+
+    len(signal) = len(signal_filt)
     """
 
     # check if window width is odd
     if not filt_window % 2 == 1:
-        raise IOError("Window width of moving average filter must be odd!")
+        raise ValueError("Window width of moving average filter must be odd!")
 
     # calculate half window width - 1
     w_window_half = int((filt_window - 1) / 2)

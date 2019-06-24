@@ -8,22 +8,44 @@ def calc_head_curv_num(path: np.ndarray,
                        stepsize_psi_preview: float = 1.0,
                        stepsize_psi_review: float = 1.0,
                        stepsize_curv_preview: float = 2.0,
-                       stepsize_curv_review: float = 2.0,) -> tuple:
+                       stepsize_curv_review: float = 2.0,
+                       calc_curv: bool = True) -> tuple:
     """
     Created by:
     Alexander Heilmeier
 
     Documentation:
-    Numerical calculation of heading psi and curvature kappa on the basis of a closed or unclosed path (i.e. array of
-    points).
+    Numerical calculation of heading psi and curvature kappa on the basis of a given path.
 
     Inputs:
-    path: array of points with size no_points x 2.
-    el_lenghts: array containing the element lengths with size no_points - 1 x 1.
-    is_closed: boolean containing if we have a closed path or not.
-    remaining parameters: preview/review distances used for numerical heading/curvature calculation.
+    path:           array of points [x, y] (always unclosed).
+    el_lenghts:     array containing the element lengths.
+    is_closed:      close path for heading and curvature calculation.
+    stepsizes:      preview/review distances used for numerical heading/curvature calculation.
+    calc_curv:      bool flag to show if curvature should be calculated as well (kappa is set 0.0 otherwise).
+
+    path must be inserted unclosed, i.e. path[-1] != path[0], even if is_closed is set True! (el_lengths is kind
+    of closed if is_closed is True of course!)
+
+    Outputs:
+    psi:            heading at every point (always unclosed).
+    kappa:          curvature at every point (always unclosed).
+
+    case is_closed is True:
+    len(path) = len(el_lengths) = len(psi) = len(kappa)
+
+    case is_closed is False:
+    len(path) = len(el_lengths) + 1 = len(psi) = len(kappa)
     """
 
+    # check inputs
+    if is_closed and path.shape[0] != el_lengths.size:
+        raise ValueError("path and el_lenghts must have the same length!")
+
+    elif not is_closed and path.shape[0] != el_lengths.size + 1:
+        raise ValueError("path must have the length of el_lengths + 1!")
+
+    # get number if points
     no_points = path.shape[0]
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -67,25 +89,30 @@ def calc_head_curv_num(path: np.ndarray,
         # CURVATURE ----------------------------------------------------------------------------------------------------
         # --------------------------------------------------------------------------------------------------------------
 
-        psi_temp = np.insert(psi, 0, psi[-ind_step_review_curv:])
-        psi_temp = np.append(psi_temp, psi[:ind_step_preview_curv])
+        if calc_curv:
+            psi_temp = np.insert(psi, 0, psi[-ind_step_review_curv:])
+            psi_temp = np.append(psi_temp, psi[:ind_step_preview_curv])
 
-        # calculate delta psi
-        delta_psi = np.zeros(no_points)
+            # calculate delta psi
+            delta_psi = np.zeros(no_points)
 
-        for i in range(no_points):
-            delta_psi[i] = trajectory_planning_helpers.normalize_psi.normalize_psi(psi_temp[i + steps_tot_curv] - psi_temp[i])
+            for i in range(no_points):
+                delta_psi[i] = trajectory_planning_helpers.normalize_psi.\
+                    normalize_psi(psi_temp[i + steps_tot_curv] - psi_temp[i])
 
-        # calculate kappa
-        s_points_cl = np.cumsum(el_lengths)
-        s_points_cl = np.insert(s_points_cl, 0, 0.0)
-        s_points = s_points_cl[:-1]
-        s_points_cl_reverse = np.flipud(-np.cumsum(np.flipud(el_lengths)))  # should not include 0.0 as last value
+            # calculate kappa
+            s_points_cl = np.cumsum(el_lengths)
+            s_points_cl = np.insert(s_points_cl, 0, 0.0)
+            s_points = s_points_cl[:-1]
+            s_points_cl_reverse = np.flipud(-np.cumsum(np.flipud(el_lengths)))  # should not include 0.0 as last value
 
-        s_points_temp = np.insert(s_points, 0, s_points_cl_reverse[-ind_step_review_curv:])
-        s_points_temp = np.append(s_points_temp, s_points_cl[-1] + s_points[:ind_step_preview_curv])
+            s_points_temp = np.insert(s_points, 0, s_points_cl_reverse[-ind_step_review_curv:])
+            s_points_temp = np.append(s_points_temp, s_points_cl[-1] + s_points[:ind_step_preview_curv])
 
-        kappa = delta_psi / (s_points_temp[steps_tot_curv:] - s_points_temp[:-steps_tot_curv])
+            kappa = delta_psi / (s_points_temp[steps_tot_curv:] - s_points_temp[:-steps_tot_curv])
+
+        else:
+            kappa = 0.0
 
     # ------------------------------------------------------------------------------------------------------------------
     # CASE: UNCLOSED PATH ----------------------------------------------------------------------------------------------
@@ -117,22 +144,26 @@ def calc_head_curv_num(path: np.ndarray,
         # CURVATURE ----------------------------------------------------------------------------------------------------
         # --------------------------------------------------------------------------------------------------------------
 
-        # calculate delta psi
-        delta_psi = np.zeros(no_points)
+        if calc_curv:
+            # calculate delta psi
+            delta_psi = np.zeros(no_points)
 
-        delta_psi[0] = psi[1] - psi[0]  # i == 0
-        delta_psi[1:-1] = psi[2:] - psi[:-2]  # 0 < i < no_points - 1
-        delta_psi[-1] = psi[-1] - psi[-2]  # i == -1
+            delta_psi[0] = psi[1] - psi[0]  # i == 0
+            delta_psi[1:-1] = psi[2:] - psi[:-2]  # 0 < i < no_points - 1
+            delta_psi[-1] = psi[-1] - psi[-2]  # i == -1
 
-        # normalize delta_psi
-        delta_psi = trajectory_planning_helpers.normalize_psi.normalize_psi(delta_psi)
+            # normalize delta_psi
+            delta_psi = trajectory_planning_helpers.normalize_psi.normalize_psi(delta_psi)
 
-        # calculate kappa
-        kappa = np.zeros(no_points)
+            # calculate kappa
+            kappa = np.zeros(no_points)
 
-        kappa[0] = delta_psi[0] / el_lengths[0]  # i == 0
-        kappa[1:-1] = delta_psi[1:-1] / (el_lengths[1:] + el_lengths[:-1])  # 0 < i < no_points - 1
-        kappa[-1] = delta_psi[-1] / el_lengths[-1]  # i == -1
+            kappa[0] = delta_psi[0] / el_lengths[0]  # i == 0
+            kappa[1:-1] = delta_psi[1:-1] / (el_lengths[1:] + el_lengths[:-1])  # 0 < i < no_points - 1
+            kappa[-1] = delta_psi[-1] / el_lengths[-1]  # i == -1
+
+        else:
+            kappa = 0.0
 
     return psi, kappa
 

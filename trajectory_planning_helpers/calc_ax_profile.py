@@ -12,11 +12,19 @@ def calc_ax_profile(vx_profile: np.ndarray,
     Function calculates the acceleration profile for a given velocity profile.
 
     Inputs:
-    vx_profile: array containing the velocity profile used as a basis for the acceleration calculations.
-    el_lengths: array containing the element lengths between every point of the velocity profile.
-    eq_length_output: assumes zero acceleration for the last point of the acceleration profile and therefore returns
-                      len(ax_profile) == len(vx_profile). Without eq_length_output:
-                      len(vx_profile) == len(ax_profile) + 1 == len(el_lengths) + 1
+    vx_profile:         array containing the velocity profile used as a basis for the acceleration calculations.
+    el_lengths:         array containing the element lengths between every point of the velocity profile.
+    eq_length_output:   assumes zero acceleration for the last point of the acceleration profile and therefore returns
+                        ax_profile with equal length to vx_profile.
+
+    Outputs:
+    ax_profile:         acceleration profile calculated for the inserted vx_profile.
+
+    case eq_length_output is True:
+    len(vx_profile) = len(el_lengths) + 1 = len(ax_profile)
+
+    case eq_length_output is False:
+    len(vx_profile) = len(el_lengths) + 1 = len(ax_profile) + 1
     """
 
     # check inputs

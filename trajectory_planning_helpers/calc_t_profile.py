@@ -14,14 +14,27 @@ def calc_t_profile(vx_profile: np.ndarray,
     Calculate a temporal duration profile for a given trajectory.
 
     Inputs:
-    vx_profile: array containing the velocity profile.
-    el_lengths: array containing the element lengths between every point of the velocity profile.
-    t_start: start time in s added to first array element.
+    vx_profile:     array containing the velocity profile.
+    el_lengths:     array containing the element lengths between every point of the velocity profile.
+    t_start:        start time in seconds added to first array element.
+    ax_profile:     acceleration profile fitting to the velocity profile.
 
-    len(t_profile) == len(el_lengths) + 1.
+    Outputs:
+    t_profile:      time profile for the given velocity profile.
+
+    len(el_lengths) + 1 = len(t_profile)
+    len(vx_profile) and len(ax_profile) must be >= len(el_lengths) as the temporal duration from one point to the next
+    is only calculated based on the previous point.
     """
 
-    # calculate acceleration profile if required (len(ax_profile) == len(vx_profile) - 1)
+    # check inputs
+    if vx_profile.size < el_lengths.size:
+        raise ValueError("vx_profile and el_lenghts must have at least the same length!")
+
+    if ax_profile is not None and ax_profile.size < el_lengths.size:
+        raise ValueError("ax_profile and el_lenghts must have at least the same length!")
+
+    # calculate acceleration profile if required
     if ax_profile is None:
         ax_profile = trajectory_planning_helpers.calc_ax_profile.calc_ax_profile(vx_profile=vx_profile,
                                                                                  el_lengths=el_lengths,

@@ -15,12 +15,12 @@ def progressbar(i: int,
     Commandline progressbar (to be called in a for loop).
 
     Input:
-    - i:                    current iteration / progress index
-    - i_total:              maximum iteration number / progress (where 100% should be reached)
-    - prefix:               prefix string to be displayed right in front of progressbar
-    - suffix:               suffix string to be displayed behind the progressbar
-    - decimals:             number of decimals behind comma (of printed percentage)
-    - length:               length of progressbar (in character spaces)
+    i:                    current iteration / progress index.
+    i_total:              maximum iteration number / progress (where 100% should be reached).
+    prefix:               prefix string to be displayed right in front of progressbar.
+    suffix:               suffix string to be displayed behind the progressbar.
+    decimals:             number of decimals behind comma (of printed percentage).
+    length:               length of progressbar (in character spaces).
     """
 
     # Calculate current percentage based on i and i_total

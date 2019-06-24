@@ -8,17 +8,18 @@ def calc_normal_vectors(psi_vel: np.ndarray) -> np.ndarray:
     Alexander Heilmeier
 
     Documentation:
-    Use heading to provide normalized normal vectors.
+    Use heading to provide normalized (i.e. unit length) normal vectors.
 
     Inputs:
-    psi_vel: array containing the heading of every point (north up, [-pi; pi[)
+    psi_vel:                array containing the heading of every point (north up, range [-pi,pi[).
+
+    Outputs:
+    normvec_normalized:     unit length normal vectors for every point.
+
+    len(psi_vel) = len(normvec_normalized)
     """
 
-    # remove second dimension
-    if psi_vel.ndim == 2:
-        psi_vel_ = np.squeeze(psi_vel)
-    else:
-        psi_vel_ = np.copy(psi_vel)
+    psi_vel_ = np.copy(psi_vel)
 
     # remap psi_vel to x-axis
     psi_vel_ -= np.pi / 2

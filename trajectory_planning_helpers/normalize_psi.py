@@ -7,16 +7,21 @@ def normalize_psi(psi: np.ndarray) -> np.ndarray:
     Alexander Heilmeier
 
     Documentation:
-    Normalize heading psi such that [-pi, pi[ holds as interval boundaries.
+    Normalize heading psi such that [-pi,pi[ holds as interval boundaries.
 
     Inputs:
-    psi: array containing headings psi to be normalized.
+    psi:        array containing headings psi to be normalized.
+
+    Outputs:
+    psi_out:    array with normalized headings psi.
+
+    len(psi) = len(psi_out)
     """
 
     # use modulo operator to remove multiples of 2*pi
     psi_out = np.sign(psi) * np.mod(np.abs(psi), 2 * np.pi)
 
-    # restrict psi to [-pi, pi[
+    # restrict psi to [-pi,pi[
     if type(psi_out) is np.ndarray:
         psi_out[psi_out >= np.pi] -= 2 * np.pi
         psi_out[psi_out < -np.pi] += 2 * np.pi

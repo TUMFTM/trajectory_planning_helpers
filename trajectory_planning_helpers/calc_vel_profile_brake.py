@@ -19,14 +19,17 @@ def calc_vel_profile_brake(ggv: np.ndarray,
     Calculate brake (may also be emergency) velocity profile based on a local trajectory.
 
     Inputs:
-    ggv:          ggv-diagram to be applied
-    kappa:        curvature profile of given trajectory in rad/m
-    el_lengths:   element lengths (distances between coordinates) of given trajectory
-    v_start:      start velocity in m/s
-    mu:           friction coefficients
-    decel_max:    maximum deceleration to be applied (if set to "None", the max. based on ggv and kappa will be used)
+    ggv:            ggv-diagram to be applied.
+    kappa:          curvature profile of given trajectory in rad/m.
+    el_lengths:     element lengths (distances between coordinates) of given trajectory.
+    v_start:        start velocity in m/s.
+    mu:             friction coefficients.
+    decel_max:      maximum deceleration to be applied (if set to "None", the max. based on ggv and kappa will be used).
 
-    len(vx_profile) = len(kappa) = len(el_lengths) + 1
+    Outputs:
+    vx_profile:     calculated velocity profile using maximum deceleration of the car.
+
+    len(kappa) = len(el_lengths) + 1 = len(mu) = len(vx_profile)
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -35,6 +38,12 @@ def calc_vel_profile_brake(ggv: np.ndarray,
 
     if decel_max is not None and not decel_max < 0.0:
         raise ValueError("Deceleration input must be negative!")
+
+    if mu is not None and kappa.size != mu.size:
+        raise ValueError("kappa and mu must have the same length!")
+
+    if kappa.size != el_lengths.size + 1:
+        raise ValueError("kappa must have the length of el_lengths + 1!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # PREPARATIONS -----------------------------------------------------------------------------------------------------
