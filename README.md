@@ -1,4 +1,11 @@
+# Description
+This repository provides some helper functions we frequently use in our trajectory planning software stack at FTM/TUM.
+Many of the functions are based on third order splines because we use them as a basis for our path planning.
+Please keep in mind that some of the functions are designed to work on a closed (race-) track and might therefore
+not work properly on a common street network.
+
 # List of components
+* `angle3pt`: Calculates angle by turning from a to c around b.
 * `calc_ax_profile`: Calculate the longitudinal acceleration profile for a given velocity profile.
 * `calc_head_curv_an`: Analytical curvature calculation on the basis of third order splines.
 * `calc_head_curv_num`: Numerical curvature calculation.
@@ -12,19 +19,8 @@
 * `import_ggv`: Import the ggv diagram containing vehicle handling limits from a text file.
 * `interp_splines`: Interpolate splines to get points with a desired stepsize.
 * `normalize_psi`: Normalize heading psi such that the interval [-pi, pi[ holds.
-* `side_of_line`: Function determines if a point is on the left or right side of a line.
-
-Contact person: [Alexander Heilmeier](mailto:alexander.heilmeier@tum.de).
-
-# List of components
-* `angle3pt`: Calculates angle by turning from a to c around b.
 * `progressbar`: Commandline progressbar (to be called in a for loop).
-
-Contact person: [Tim Stahl](mailto:stahl@ftm.mw.tum.de).
-
-# List of components
+* `side_of_line`: Function determines if a point is on the left or right side of a line.
 * `spline_approximation`: Function used to obtain a smoothed track on the basis of a spline approximation.
 
-Author: Fabian Christ
-
-Contact person: [Alexander Heilmeier](mailto:alexander.heilmeier@tum.de).
+Contact persons: [Alexander Heilmeier](mailto:alexander.heilmeier@tum.de), [Tim Stahl](mailto:stahl@ftm.mw.tum.de).
