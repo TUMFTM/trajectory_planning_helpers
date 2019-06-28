@@ -43,7 +43,7 @@ def interp_splines(coeffs_x: np.ndarray,
     if coeffs_x.shape[0] != coeffs_y.shape[0]:
         raise ValueError("Coefficient matrices must have the same length!")
 
-    if coeffs_x.shape[0] != spline_lengths.size:
+    if spline_lengths is not None and coeffs_x.shape[0] != spline_lengths.size:
         raise ValueError("coeffs_x and spline_lengths must have the same length!")
 
     # check if coeffs_x and coeffs_y have exactly two dimensions and raise error otherwise
