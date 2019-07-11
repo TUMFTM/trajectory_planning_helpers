@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 
 def calc_spline_lengths(coeffs_x: np.ndarray,
@@ -48,8 +49,8 @@ def calc_spline_lengths(coeffs_x: np.ndarray,
 
     if quickndirty:
         for i in range(no_splines):
-            spline_lengths[i] = np.sqrt(np.power(np.sum(coeffs_x[i]) - coeffs_x[i, 0], 2)
-                                        + np.power(np.sum(coeffs_y[i]) - coeffs_y[i, 0], 2))
+            spline_lengths[i] = math.sqrt(math.pow(np.sum(coeffs_x[i]) - coeffs_x[i, 0], 2)
+                                          + math.pow(np.sum(coeffs_y[i]) - coeffs_y[i, 0], 2))
 
     else:
         # loop through all the splines and calculate intermediate coordinates

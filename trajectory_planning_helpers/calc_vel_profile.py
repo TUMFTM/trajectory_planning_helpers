@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import trajectory_planning_helpers.conv_filt
 
 
@@ -111,7 +112,7 @@ def solver_fb_unclosed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarra
 
     for i in range(no_points):
         ay_max_curr = mu[i] * np.interp(vx_profile[i], ggv[:, 0], ggv[:, 4])
-        vx_profile[i] = np.sqrt(ay_max_curr * radii[i])
+        vx_profile[i] = math.sqrt(ay_max_curr * radii[i])
 
     # cut vx_profile to car's top speed
     vx_max = ggv[-1, 0]
@@ -166,7 +167,7 @@ def solver_fb_closed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarray,
         for j in range(2):
             # get proper possible lateral acceleration for velocity estimate
             ay_max_curr = mu[i] * np.interp(vx_profile[i], ggv[:, 0], ggv[:, 4])
-            vx_profile[i] = np.sqrt(ay_max_curr * radii[i])
+            vx_profile[i] = math.sqrt(ay_max_curr * radii[i])
 
     # cut vx_profile to car's top speed
     vx_max = ggv[-1, 0]
@@ -271,12 +272,12 @@ def solver_fb_acc_profile(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.nda
             # calculate possible and used accelerations (considering tires)
             ax_max_cur_tires = mu_ax * np.interp(vx_profile[i], ggv_mod[:, 0], ggv_mod[:, 2])
             ay_max_cur_tires = mu_mod[i] * np.interp(vx_profile[i], ggv_mod[:, 0], ggv_mod[:, 4])
-            ay_used_cur = np.power(vx_profile[i], 2) / radii_mod[i]
+            ay_used_cur = math.pow(vx_profile[i], 2) / radii_mod[i]
 
-            radicand = 1 - np.power(ay_used_cur / ay_max_cur_tires, tire_model_exp)
+            radicand = 1 - math.pow(ay_used_cur / ay_max_cur_tires, tire_model_exp)
 
             if radicand > 0.0:
-                ax_possible_cur_tires = ax_max_cur_tires * np.power(radicand, 1.0 / tire_model_exp)
+                ax_possible_cur_tires = ax_max_cur_tires * math.pow(radicand, 1.0 / tire_model_exp)
             else:
                 ax_possible_cur_tires = 0.0
 
@@ -288,7 +289,7 @@ def solver_fb_acc_profile(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.nda
             else:
                 ax_possible_cur = ax_possible_cur_tires
 
-            vx_possible_next = np.sqrt(np.power(vx_profile[i], 2) + 2 * ax_possible_cur * el_lengths_mod[i])
+            vx_possible_next = math.sqrt(math.pow(vx_profile[i], 2) + 2 * ax_possible_cur * el_lengths_mod[i])
 
             if vx_possible_next < vx_profile[i + 1]:
                 vx_profile[i + 1] = vx_possible_next

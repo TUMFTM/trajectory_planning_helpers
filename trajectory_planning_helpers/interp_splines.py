@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import trajectory_planning_helpers.calc_spline_lengths
 
 
@@ -72,7 +73,7 @@ def interp_splines(coeffs_x: np.ndarray,
         dists_cum = np.cumsum(spline_lengths)
 
         # calculate number of interpolation points and distances (+1 because last point is included at first)
-        no_interp_points = (np.ceil(dists_cum[-1] / stepsize_approx)).astype(int) + 1
+        no_interp_points = math.ceil(dists_cum[-1] / stepsize_approx) + 1
         dists_interp = np.linspace(0.0, dists_cum[-1], no_interp_points)
 
     else:
@@ -113,15 +114,15 @@ def interp_splines(coeffs_x: np.ndarray,
                     t_values[i] = dists_interp[i] / spline_lengths[0]
 
             # calculate coords
-            path_interp[i, 0] = coeffs_x[j, 0]\
-                                    + coeffs_x[j, 1] * t_values[i]\
-                                    + coeffs_x[j, 2] * np.power(t_values[i], 2) \
-                                    + coeffs_x[j, 3] * np.power(t_values[i], 3)
+            path_interp[i, 0] = coeffs_x[j, 0] \
+                                + coeffs_x[j, 1] * t_values[i]\
+                                + coeffs_x[j, 2] * math.pow(t_values[i], 2) \
+                                + coeffs_x[j, 3] * math.pow(t_values[i], 3)
 
             path_interp[i, 1] = coeffs_y[j, 0]\
-                                    + coeffs_y[j, 1] * t_values[i]\
-                                    + coeffs_y[j, 2] * np.power(t_values[i], 2) \
-                                    + coeffs_y[j, 3] * np.power(t_values[i], 3)
+                                + coeffs_y[j, 1] * t_values[i]\
+                                + coeffs_y[j, 2] * math.pow(t_values[i], 2) \
+                                + coeffs_y[j, 3] * math.pow(t_values[i], 3)
 
     else:
 

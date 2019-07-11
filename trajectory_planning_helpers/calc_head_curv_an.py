@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import trajectory_planning_helpers.normalize_psi
 
 
@@ -50,7 +51,7 @@ def calc_head_curv_an(coeffs_x: np.ndarray,
           + 3 * coeffs_y[ind_spls, 3] * np.power(t_spls, 2)
 
     # calculate heading psi (pi/2 must be substracted due to our convention that psi = 0 is north)
-    psi = np.arctan2(y_d, x_d) - np.pi / 2
+    psi = np.arctan2(y_d, x_d) - math.pi / 2
     psi = trajectory_planning_helpers.normalize_psi.normalize_psi(psi)
 
     # ------------------------------------------------------------------------------------------------------------------

@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 
 def calc_splines(path: np.ndarray,
@@ -92,7 +93,7 @@ def calc_splines(path: np.ndarray,
             M[j: j + 4, j: j + 8] = template_M
 
             M[j + 2, j + 5] *= scaling[i]
-            M[j + 3, j + 6] *= np.power(scaling[i], 2)
+            M[j + 3, j + 6] *= math.pow(scaling[i], 2)
 
         else:
             M[j: j + 2, j: j + 4] = [[1,  0,  0,  0],  # no curvature and heading bounds on last element
@@ -119,8 +120,8 @@ def calc_splines(path: np.ndarray,
         else:
             el_length_s = el_lengths[0]
 
-        b_x[-2] = np.cos(psi_s + np.pi / 2) * el_length_s
-        b_y[-2] = np.sin(psi_s + np.pi / 2) * el_length_s
+        b_x[-2] = math.cos(psi_s + math.pi / 2) * el_length_s
+        b_y[-2] = math.sin(psi_s + math.pi / 2) * el_length_s
 
         # heading end
         if el_lengths is None:
@@ -128,8 +129,8 @@ def calc_splines(path: np.ndarray,
         else:
             el_length_e = el_lengths[-1]
 
-        b_x[-1] = np.cos(psi_e + np.pi / 2) * el_length_e
-        b_y[-1] = np.sin(psi_e + np.pi / 2) * el_length_e
+        b_x[-1] = math.cos(psi_e + math.pi / 2) * el_length_e
+        b_y[-1] = math.sin(psi_e + math.pi / 2) * el_length_e
 
     else:
         # gradient boundary conditions (for a closed spline)
@@ -139,7 +140,7 @@ def calc_splines(path: np.ndarray,
         # b_y[-2] = 0
 
         # curvature boundary conditions (for a closed spline)
-        M[-1, 2] = 2 * np.power(scaling[-1], 2)
+        M[-1, 2] = 2 * math.pow(scaling[-1], 2)
         M[-1, -2:] = [-2, -6]
         # b_x[-1] = 0
         # b_y[-1] = 0

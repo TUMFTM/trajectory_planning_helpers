@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import trajectory_planning_helpers.normalize_psi
 
 
@@ -59,10 +60,10 @@ def calc_head_curv_num(path: np.ndarray,
         # --------------------------------------------------------------------------------------------------------------
 
         # calculate how many points we look to the front and rear of the current position for the head/curv calculations
-        ind_step_preview_psi = np.round(stepsize_psi_preview / np.average(el_lengths)).astype(int)
-        ind_step_review_psi = np.round(stepsize_psi_review / np.average(el_lengths)).astype(int)
-        ind_step_preview_curv = np.round(stepsize_curv_preview / np.average(el_lengths)).astype(int)
-        ind_step_review_curv = np.round(stepsize_curv_review / np.average(el_lengths)).astype(int)
+        ind_step_preview_psi = round(stepsize_psi_preview / np.average(el_lengths))
+        ind_step_review_psi = round(stepsize_psi_review / np.average(el_lengths))
+        ind_step_preview_curv = round(stepsize_curv_preview / np.average(el_lengths))
+        ind_step_review_curv = round(stepsize_curv_review / np.average(el_lengths))
 
         ind_step_preview_psi = max(ind_step_preview_psi, 1)
         ind_step_review_psi = max(ind_step_review_psi, 1)
@@ -82,7 +83,7 @@ def calc_head_curv_num(path: np.ndarray,
                              path_temp[steps_tot_psi:, 1] - path_temp[:-steps_tot_psi, 1]), axis=1)
 
         # calculate psi of tangent vectors (pi/2 must be substracted due to our convention that psi = 0 is north)
-        psi = np.arctan2(tangvecs[:, 1], tangvecs[:, 0]) - np.pi / 2
+        psi = np.arctan2(tangvecs[:, 1], tangvecs[:, 0]) - math.pi / 2
         psi = trajectory_planning_helpers.normalize_psi.normalize_psi(psi)
 
         # --------------------------------------------------------------------------------------------------------------
@@ -137,7 +138,7 @@ def calc_head_curv_num(path: np.ndarray,
         tangvecs[-1, 1] = path[-1, 1] - path[-2, 1]
 
         # calculate psi of tangent vectors (pi/2 must be substracted due to our convention that psi = 0 is north)
-        psi = np.arctan2(tangvecs[:, 1], tangvecs[:, 0]) - np.pi / 2
+        psi = np.arctan2(tangvecs[:, 1], tangvecs[:, 0]) - math.pi / 2
         psi = trajectory_planning_helpers.normalize_psi.normalize_psi(psi)
 
         # --------------------------------------------------------------------------------------------------------------

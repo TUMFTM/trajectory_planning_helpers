@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import trajectory_planning_helpers.calc_ax_profile
 
 
@@ -45,8 +46,8 @@ def calc_t_profile(vx_profile: np.ndarray,
     t_steps = np.zeros(no_points)
 
     for i in range(no_points):
-        if not np.isclose(ax_profile[i], 0.0):
-            t_steps[i] = (-vx_profile[i] + np.sqrt((np.power(vx_profile[i], 2) + 2 * ax_profile[i] * el_lengths[i]))) \
+        if not math.isclose(ax_profile[i], 0.0):
+            t_steps[i] = (-vx_profile[i] + math.sqrt((math.pow(vx_profile[i], 2) + 2 * ax_profile[i] * el_lengths[i])))\
                          / ax_profile[i]
 
         else:  # ax == 0.0

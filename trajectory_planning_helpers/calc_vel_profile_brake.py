@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 
 def calc_vel_profile_brake(ggv: np.ndarray,
@@ -70,12 +71,12 @@ def calc_vel_profile_brake(ggv: np.ndarray,
         # calculate required values
         ax_min_cur_tires = mu[i] * np.interp(vx_profile[i], ggv[:, 0], ggv[:, 3])
         ay_max_cur_tires = mu[i] * np.interp(vx_profile[i], ggv[:, 0], ggv[:, 4])
-        ay_used_cur = np.power(vx_profile[i], 2) / radii[i]
+        ay_used_cur = math.pow(vx_profile[i], 2) / radii[i]
 
         if ay_used_cur < ay_max_cur_tires:
             # car is able to stay on track -> decelerate with unused tire potential
-            radicand = 1 - np.power(ay_used_cur / ay_max_cur_tires, tire_model_exp)
-            ax_possible_cur_tires = ax_min_cur_tires * np.power(radicand, 1.0 / tire_model_exp)
+            radicand = 1 - math.pow(ay_used_cur / ay_max_cur_tires, tire_model_exp)
+            ax_possible_cur_tires = ax_min_cur_tires * math.pow(radicand, 1.0 / tire_model_exp)
 
             # check if ax_possible_cur_tires is more than allowed decel_max and reduce it if so
             if decel_max is not None and ax_possible_cur_tires < decel_max:
@@ -84,12 +85,12 @@ def calc_vel_profile_brake(ggv: np.ndarray,
                 ax_use = ax_possible_cur_tires
 
             # calculate velocity in the next point based on ax_use
-            radicand = np.power(vx_profile[i], 2) + 2 * ax_use * el_lengths[i]
+            radicand = math.pow(vx_profile[i], 2) + 2 * ax_use * el_lengths[i]
 
             if radicand < 0.0:
                 break
             else:
-                vx_profile[i + 1] = np.sqrt(radicand)
+                vx_profile[i + 1] = math.sqrt(radicand)
 
         # if lateral acceleration is used completely do not apply any longitudinal deceleration
         else:
