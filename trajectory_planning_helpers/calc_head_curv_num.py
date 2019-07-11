@@ -60,10 +60,10 @@ def calc_head_curv_num(path: np.ndarray,
         # --------------------------------------------------------------------------------------------------------------
 
         # calculate how many points we look to the front and rear of the current position for the head/curv calculations
-        ind_step_preview_psi = round(stepsize_psi_preview / np.average(el_lengths))
-        ind_step_review_psi = round(stepsize_psi_review / np.average(el_lengths))
-        ind_step_preview_curv = round(stepsize_curv_preview / np.average(el_lengths))
-        ind_step_review_curv = round(stepsize_curv_review / np.average(el_lengths))
+        ind_step_preview_psi = round(stepsize_psi_preview / float(np.average(el_lengths)))
+        ind_step_review_psi = round(stepsize_psi_review / float(np.average(el_lengths)))
+        ind_step_preview_curv = round(stepsize_curv_preview / float(np.average(el_lengths)))
+        ind_step_review_curv = round(stepsize_curv_review / float(np.average(el_lengths)))
 
         ind_step_preview_psi = max(ind_step_preview_psi, 1)
         ind_step_review_psi = max(ind_step_review_psi, 1)
