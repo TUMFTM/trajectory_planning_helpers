@@ -69,20 +69,20 @@ def calc_vel_profile(ggv: np.ndarray,
 
     # call solver
     if not closed:
-        vx_profile = solver_fb_unclosed(ggv=ggv,
+        vx_profile = __solver_fb_unclosed(ggv=ggv,
+                                          radii=radii,
+                                          el_lengths=el_lengths,
+                                          mu=mu,
+                                          v_start=v_start,
+                                          v_end=v_end,
+                                          tire_model_exp=tire_model_exp)
+
+    else:
+        vx_profile = __solver_fb_closed(ggv=ggv,
                                         radii=radii,
                                         el_lengths=el_lengths,
                                         mu=mu,
-                                        v_start=v_start,
-                                        v_end=v_end,
                                         tire_model_exp=tire_model_exp)
-
-    else:
-        vx_profile = solver_fb_closed(ggv=ggv,
-                                      radii=radii,
-                                      el_lengths=el_lengths,
-                                      mu=mu,
-                                      tire_model_exp=tire_model_exp)
 
     # ------------------------------------------------------------------------------------------------------------------
     # POSTPROCESSING ---------------------------------------------------------------------------------------------------
@@ -96,8 +96,8 @@ def calc_vel_profile(ggv: np.ndarray,
     return vx_profile
 
 
-def solver_fb_unclosed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarray, mu: np.ndarray, v_start: float,
-                       v_end: float = None, tire_model_exp: float = 2.0) -> np.ndarray:
+def __solver_fb_unclosed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarray, mu: np.ndarray, v_start: float,
+                         v_end: float = None, tire_model_exp: float = 2.0) -> np.ndarray:
 
     # ------------------------------------------------------------------------------------------------------------------
     # FORWARD BACKWARD SOLVER ------------------------------------------------------------------------------------------
@@ -123,32 +123,32 @@ def solver_fb_unclosed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarra
         vx_profile[0] = v_start
 
     # calculate acceleration profile
-    vx_profile = solver_fb_acc_profile(ggv=ggv,
-                                       radii=radii,
-                                       el_lengths=el_lengths,
-                                       mu=mu,
-                                       vx_profile=vx_profile,
-                                       rev_dir=False,
-                                       tire_model_exp=tire_model_exp)
+    vx_profile = __solver_fb_acc_profile(ggv=ggv,
+                                         radii=radii,
+                                         el_lengths=el_lengths,
+                                         mu=mu,
+                                         vx_profile=vx_profile,
+                                         rev_dir=False,
+                                         tire_model_exp=tire_model_exp)
 
     # consider v_end
     if v_end is not None and vx_profile[-1] > v_end:
         vx_profile[-1] = v_end
 
     # calculate deceleration profile
-    vx_profile = solver_fb_acc_profile(ggv=ggv,
-                                       radii=radii,
-                                       el_lengths=el_lengths,
-                                       mu=mu,
-                                       vx_profile=vx_profile,
-                                       rev_dir=True,
-                                       tire_model_exp=tire_model_exp)
+    vx_profile = __solver_fb_acc_profile(ggv=ggv,
+                                         radii=radii,
+                                         el_lengths=el_lengths,
+                                         mu=mu,
+                                         vx_profile=vx_profile,
+                                         rev_dir=True,
+                                         tire_model_exp=tire_model_exp)
 
     return vx_profile
 
 
-def solver_fb_closed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarray, mu: np.ndarray,
-                     tire_model_exp: float = 2.0) -> np.ndarray:
+def __solver_fb_closed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarray, mu: np.ndarray,
+                       tire_model_exp: float = 2.0) -> np.ndarray:
 
     # ------------------------------------------------------------------------------------------------------------------
     # FORWARD BACKWARD SOLVER ------------------------------------------------------------------------------------------
@@ -182,25 +182,25 @@ def solver_fb_closed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarray,
     mu_double = np.concatenate((mu, mu), axis=0)
 
     # calculate acceleration profile
-    vx_profile_double = solver_fb_acc_profile(ggv=ggv,
-                                              radii=radii_double,
-                                              el_lengths=el_lengths_double,
-                                              mu=mu_double,
-                                              vx_profile=vx_profile_double,
-                                              tire_model_exp=tire_model_exp,
-                                              rev_dir=False)
+    vx_profile_double = __solver_fb_acc_profile(ggv=ggv,
+                                                radii=radii_double,
+                                                el_lengths=el_lengths_double,
+                                                mu=mu_double,
+                                                vx_profile=vx_profile_double,
+                                                tire_model_exp=tire_model_exp,
+                                                rev_dir=False)
 
     # use second lap of acceleration profile
     vx_profile_double = np.concatenate((vx_profile_double[no_points:], vx_profile_double[no_points:]), axis=0)
 
     # calculate deceleration profile
-    vx_profile_double = solver_fb_acc_profile(ggv=ggv,
-                                              radii=radii_double,
-                                              el_lengths=el_lengths_double,
-                                              mu=mu_double,
-                                              vx_profile=vx_profile_double,
-                                              tire_model_exp=tire_model_exp,
-                                              rev_dir=True)
+    vx_profile_double = __solver_fb_acc_profile(ggv=ggv,
+                                                radii=radii_double,
+                                                el_lengths=el_lengths_double,
+                                                mu=mu_double,
+                                                vx_profile=vx_profile_double,
+                                                tire_model_exp=tire_model_exp,
+                                                rev_dir=True)
 
     # use second lap of deceleration profile
     vx_profile = vx_profile_double[no_points:]
@@ -208,8 +208,8 @@ def solver_fb_closed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarray,
     return vx_profile
 
 
-def solver_fb_acc_profile(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarray, mu: np.ndarray,
-                          vx_profile: np.ndarray, rev_dir: bool = False, tire_model_exp: float = 2.0) -> np.ndarray:
+def __solver_fb_acc_profile(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarray, mu: np.ndarray,
+                            vx_profile: np.ndarray, rev_dir: bool = False, tire_model_exp: float = 2.0) -> np.ndarray:
 
     # ------------------------------------------------------------------------------------------------------------------
     # PREPARATIONS -----------------------------------------------------------------------------------------------------
@@ -263,34 +263,42 @@ def solver_fb_acc_profile(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.nda
 
         # start from current index and run until either the end of the lap or a termination criterion are reached
         while i < no_points - 1:
-            # consider that mu > 1.0 does not scale positive longitudinal acceleration
-            mu_ax = mu_mod[i]
 
-            if not rev_dir and mu_ax > 1.0:
-                mu_ax = 1.0
-
-            # calculate possible and used accelerations (considering tires)
-            ax_max_cur_tires = mu_ax * np.interp(vx_profile[i], ggv_mod[:, 0], ggv_mod[:, 2])
-            ay_max_cur_tires = mu_mod[i] * np.interp(vx_profile[i], ggv_mod[:, 0], ggv_mod[:, 4])
-            ay_used_cur = math.pow(vx_profile[i], 2) / radii_mod[i]
-
-            radicand = 1 - math.pow(ay_used_cur / ay_max_cur_tires, tire_model_exp)
-
-            if radicand > 0.0:
-                ax_possible_cur_tires = ax_max_cur_tires * math.pow(radicand, 1.0 / tire_model_exp)
-            else:
-                ax_possible_cur_tires = 0.0
-
-            # consider limitation imposed by electrical machines in positive acceleration (only forward direction)
-            ax_max_cur_machines = np.interp(vx_profile[i], ggv_mod[:, 0], ggv_mod[:, 1])
-
-            if not rev_dir:
-                ax_possible_cur = min(ax_max_cur_machines, ax_possible_cur_tires)
-            else:
-                ax_possible_cur = ax_possible_cur_tires
+            ax_possible_cur = __calc_ax_poss(vx_start=vx_profile[i],
+                                             radius=radii_mod[i],
+                                             ggv=ggv_mod,
+                                             mu=mu_mod[i],
+                                             rev_dir=rev_dir,
+                                             tire_model_exp=tire_model_exp)
 
             vx_possible_next = math.sqrt(math.pow(vx_profile[i], 2) + 2 * ax_possible_cur * el_lengths_mod[i])
 
+            if rev_dir:
+                """
+                We have to loop the calculation if we are in the backwards iteration (currently just once). This is 
+                because we calculate the possible ax at a point i which does not necessarily fit for point i + 1 
+                (which is i - 1 in the real direction). At point i + 1 (or i - 1 in real direction) we have a different 
+                start velocity (vx_possible_next), radius and mu value while the absolute value of ax remains the same 
+                in both directions.
+                """
+
+                # looping just once at the moment
+                for j in range(1):
+                    ax_possible_next = __calc_ax_poss(vx_start=vx_possible_next,
+                                                      radius=radii_mod[i + 1],
+                                                      ggv=ggv_mod,
+                                                      mu=mu_mod[i + 1],
+                                                      rev_dir=rev_dir,
+                                                      tire_model_exp=tire_model_exp)
+
+                    vx_tmp = math.sqrt(math.pow(vx_profile[i], 2) + 2 * ax_possible_next * el_lengths_mod[i])
+
+                    if vx_tmp < vx_possible_next:
+                        vx_possible_next = vx_tmp
+                    else:
+                        break
+
+            # save possible next velocity if it is smaller than the current value
             if vx_possible_next < vx_profile[i + 1]:
                 vx_profile[i + 1] = vx_possible_next
 
@@ -310,6 +318,38 @@ def solver_fb_acc_profile(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.nda
         vx_profile = np.flipud(vx_profile)
 
     return vx_profile
+
+
+def __calc_ax_poss(vx_start: float, radius: float, ggv: np.ndarray, mu: float, rev_dir: bool,
+                   tire_model_exp: float = 2.0) -> float:
+    """This function returns the possible longitudinal acceleration in the current step/point."""
+
+    # consider that mu > 1.0 does not scale positive longitudinal acceleration
+    mu_ax = mu
+
+    if not rev_dir and mu_ax > 1.0:
+        mu_ax = 1.0
+
+    # calculate possible and used accelerations (considering tires)
+    ax_max_cur_tires = mu_ax * np.interp(vx_start, ggv[:, 0], ggv[:, 2])
+    ay_max_cur_tires = mu * np.interp(vx_start, ggv[:, 0], ggv[:, 4])
+    ay_used_cur = math.pow(vx_start, 2) / radius
+
+    radicand = 1 - math.pow(ay_used_cur / ay_max_cur_tires, tire_model_exp)
+
+    if radicand > 0.0:
+        ax_possible_cur_tires = ax_max_cur_tires * math.pow(radicand, 1.0 / tire_model_exp)
+    else:
+        ax_possible_cur_tires = 0.0
+
+    # consider limitation imposed by electrical machines in positive acceleration (only forward direction)
+    if not rev_dir:
+        ax_max_cur_machines = np.interp(vx_start, ggv[:, 0], ggv[:, 1])
+        ax_possible_cur = min(ax_max_cur_machines, ax_possible_cur_tires)
+    else:
+        ax_possible_cur = ax_possible_cur_tires
+
+    return ax_possible_cur
 
 
 # testing --------------------------------------------------------------------------------------------------------------
