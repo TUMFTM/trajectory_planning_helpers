@@ -110,9 +110,8 @@ def __solver_fb_unclosed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndar
     ay_max_global = mu_mean * np.amin(np.abs(ggv[:, 4]))    # get first lateral acceleration estimate
     vx_profile = np.sqrt(ay_max_global * radii)             # get first velocity profile estimate
 
-    for i in range(no_points):
-        ay_max_curr = mu[i] * np.interp(vx_profile[i], ggv[:, 0], ggv[:, 4])
-        vx_profile[i] = math.sqrt(ay_max_curr * radii[i])
+    ay_max_curr = mu * np.interp(vx_profile, ggv[:, 0], ggv[:, 4])
+    vx_profile = np.sqrt(np.multiply(ay_max_curr, radii))
 
     # cut vx_profile to car's top speed
     vx_max = ggv[-1, 0]
@@ -161,13 +160,10 @@ def __solver_fb_closed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarra
     ay_max_global = mu_mean * np.amin(np.abs(ggv[:, 4]))    # get first lateral acceleration estimate
     vx_profile = np.sqrt(ay_max_global * radii)             # get first velocity estimate (radii must be positive!)
 
-    for i in range(no_points):
-        # do it two times to improve accuracy (because of velocity-dependent accelerations)
-
-        for j in range(2):
-            # get proper possible lateral acceleration for velocity estimate
-            ay_max_curr = mu[i] * np.interp(vx_profile[i], ggv[:, 0], ggv[:, 4])
-            vx_profile[i] = math.sqrt(ay_max_curr * radii[i])
+    # do it two times to improve accuracy (because of velocity-dependent accelerations)
+    for i in range(2):
+        ay_max_curr = mu * np.interp(vx_profile, ggv[:, 0], ggv[:, 4])
+        vx_profile = np.sqrt(np.multiply(ay_max_curr, radii))
 
     # cut vx_profile to car's top speed
     vx_max = ggv[-1, 0]
