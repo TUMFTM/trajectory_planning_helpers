@@ -11,7 +11,7 @@ def calc_vel_profile(ggv: np.ndarray,
                      v_start: float = None,
                      v_end: float = None,
                      filt_window: int = None,
-                     tire_model_exp: float = 2.0) -> np.ndarray:
+                     dyn_model_exp: float = 1.0) -> np.ndarray:
     """
     Created by:
     Alexander Heilmeier
@@ -31,7 +31,7 @@ def calc_vel_profile(ggv: np.ndarray,
     v_start:            start velocity in m/s (used in unclosed case only).
     v_end:              end velocity in m/s (used in unclosed case only).
     filt_window:        filter window size for moving average filter (must be odd).
-    tire_model_exp:     exponent used in the dynamics model.
+    dyn_model_exp:      exponent used in the vehicle dynamics model.
 
     All inputs must be inserted unclosed, i.e. kappa[-1] != kappa[0], even if closed is set True! (el_lengths is kind of
     closed if closed is True of course!)
@@ -75,14 +75,14 @@ def calc_vel_profile(ggv: np.ndarray,
                                           mu=mu,
                                           v_start=v_start,
                                           v_end=v_end,
-                                          tire_model_exp=tire_model_exp)
+                                          dyn_model_exp=dyn_model_exp)
 
     else:
         vx_profile = __solver_fb_closed(ggv=ggv,
                                         radii=radii,
                                         el_lengths=el_lengths,
                                         mu=mu,
-                                        tire_model_exp=tire_model_exp)
+                                        dyn_model_exp=dyn_model_exp)
 
     # ------------------------------------------------------------------------------------------------------------------
     # POSTPROCESSING ---------------------------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ def calc_vel_profile(ggv: np.ndarray,
 
 
 def __solver_fb_unclosed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarray, mu: np.ndarray, v_start: float,
-                         v_end: float = None, tire_model_exp: float = 2.0) -> np.ndarray:
+                         v_end: float = None, dyn_model_exp: float = 1.0) -> np.ndarray:
 
     # ------------------------------------------------------------------------------------------------------------------
     # FORWARD BACKWARD SOLVER ------------------------------------------------------------------------------------------
@@ -128,7 +128,7 @@ def __solver_fb_unclosed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndar
                                          mu=mu,
                                          vx_profile=vx_profile,
                                          rev_dir=False,
-                                         tire_model_exp=tire_model_exp)
+                                         dyn_model_exp=dyn_model_exp)
 
     # consider v_end
     if v_end is not None and vx_profile[-1] > v_end:
@@ -141,13 +141,13 @@ def __solver_fb_unclosed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndar
                                          mu=mu,
                                          vx_profile=vx_profile,
                                          rev_dir=True,
-                                         tire_model_exp=tire_model_exp)
+                                         dyn_model_exp=dyn_model_exp)
 
     return vx_profile
 
 
 def __solver_fb_closed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarray, mu: np.ndarray,
-                       tire_model_exp: float = 2.0) -> np.ndarray:
+                       dyn_model_exp: float = 1.0) -> np.ndarray:
 
     # ------------------------------------------------------------------------------------------------------------------
     # FORWARD BACKWARD SOLVER ------------------------------------------------------------------------------------------
@@ -183,7 +183,7 @@ def __solver_fb_closed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarra
                                                 el_lengths=el_lengths_double,
                                                 mu=mu_double,
                                                 vx_profile=vx_profile_double,
-                                                tire_model_exp=tire_model_exp,
+                                                dyn_model_exp=dyn_model_exp,
                                                 rev_dir=False)
 
     # use second lap of acceleration profile
@@ -195,7 +195,7 @@ def __solver_fb_closed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarra
                                                 el_lengths=el_lengths_double,
                                                 mu=mu_double,
                                                 vx_profile=vx_profile_double,
-                                                tire_model_exp=tire_model_exp,
+                                                dyn_model_exp=dyn_model_exp,
                                                 rev_dir=True)
 
     # use second lap of deceleration profile
@@ -205,7 +205,7 @@ def __solver_fb_closed(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarra
 
 
 def __solver_fb_acc_profile(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.ndarray, mu: np.ndarray,
-                            vx_profile: np.ndarray, rev_dir: bool = False, tire_model_exp: float = 2.0) -> np.ndarray:
+                            vx_profile: np.ndarray, rev_dir: bool = False, dyn_model_exp: float = 1.0) -> np.ndarray:
 
     # ------------------------------------------------------------------------------------------------------------------
     # PREPARATIONS -----------------------------------------------------------------------------------------------------
@@ -265,7 +265,7 @@ def __solver_fb_acc_profile(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.n
                                              ggv=ggv_mod,
                                              mu=mu_mod[i],
                                              rev_dir=rev_dir,
-                                             tire_model_exp=tire_model_exp)
+                                             dyn_model_exp=dyn_model_exp)
 
             vx_possible_next = math.sqrt(math.pow(vx_profile[i], 2) + 2 * ax_possible_cur * el_lengths_mod[i])
 
@@ -285,7 +285,7 @@ def __solver_fb_acc_profile(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.n
                                                       ggv=ggv_mod,
                                                       mu=mu_mod[i + 1],
                                                       rev_dir=rev_dir,
-                                                      tire_model_exp=tire_model_exp)
+                                                      dyn_model_exp=dyn_model_exp)
 
                     vx_tmp = math.sqrt(math.pow(vx_profile[i], 2) + 2 * ax_possible_next * el_lengths_mod[i])
 
@@ -317,7 +317,7 @@ def __solver_fb_acc_profile(ggv: np.ndarray, radii: np.ndarray, el_lengths: np.n
 
 
 def __calc_ax_poss(vx_start: float, radius: float, ggv: np.ndarray, mu: float, rev_dir: bool,
-                   tire_model_exp: float = 2.0) -> float:
+                   dyn_model_exp: float = 1.0) -> float:
     """This function returns the possible longitudinal acceleration in the current step/point."""
 
     # consider that mu > 1.0 does not scale positive longitudinal acceleration
@@ -331,10 +331,10 @@ def __calc_ax_poss(vx_start: float, radius: float, ggv: np.ndarray, mu: float, r
     ay_max_cur_tires = mu * np.interp(vx_start, ggv[:, 0], ggv[:, 4])
     ay_used_cur = math.pow(vx_start, 2) / radius
 
-    radicand = 1 - math.pow(ay_used_cur / ay_max_cur_tires, tire_model_exp)
+    radicand = 1 - math.pow(ay_used_cur / ay_max_cur_tires, dyn_model_exp)
 
     if radicand > 0.0:
-        ax_possible_cur_tires = ax_max_cur_tires * math.pow(radicand, 1.0 / tire_model_exp)
+        ax_possible_cur_tires = ax_max_cur_tires * math.pow(radicand, 1.0 / dyn_model_exp)
     else:
         ax_possible_cur_tires = 0.0
 

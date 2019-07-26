@@ -8,7 +8,7 @@ def calc_vel_profile_brake(ggv: np.ndarray,
                            v_start: float,
                            mu: np.ndarray = None,
                            decel_max: float = None,
-                           tire_model_exp: float = 2.0) -> np.ndarray:
+                           dyn_model_exp: float = 1.0) -> np.ndarray:
     """
     Created by:
     Alexander Heilmeier
@@ -75,8 +75,8 @@ def calc_vel_profile_brake(ggv: np.ndarray,
 
         if ay_used_cur < ay_max_cur_tires:
             # car is able to stay on track -> decelerate with unused tire potential
-            radicand = 1 - math.pow(ay_used_cur / ay_max_cur_tires, tire_model_exp)
-            ax_possible_cur_tires = ax_min_cur_tires * math.pow(radicand, 1.0 / tire_model_exp)
+            radicand = 1 - math.pow(ay_used_cur / ay_max_cur_tires, dyn_model_exp)
+            ax_possible_cur_tires = ax_min_cur_tires * math.pow(radicand, 1.0 / dyn_model_exp)
 
             # check if ax_possible_cur_tires is more than allowed decel_max and reduce it if so
             if decel_max is not None and ax_possible_cur_tires < decel_max:
