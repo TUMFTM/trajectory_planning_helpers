@@ -19,6 +19,8 @@ not work properly on a common street network.
 * `import_ggv`: Import the ggv diagram containing vehicle handling limits from a text file.
 * `interp_splines`: Interpolate splines to get points with a desired stepsize.
 * `normalize_psi`: Normalize heading psi such that the interval [-pi, pi[ holds.
+* `path_matching_global`: Match own vehicle position to a global (i.e. closed) path.
+* `path_matching_local`: Match own vehicle position to a local (i.e. unclosed) path.
 * `progressbar`: Commandline progressbar (to be called in a for loop).
 * `side_of_line`: Function determines if a point is on the left or right side of a line.
 * `spline_approximation`: Function used to obtain a smoothed track on the basis of a spline approximation.

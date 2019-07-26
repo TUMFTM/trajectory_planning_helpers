@@ -15,3 +15,5 @@ import trajectory_planning_helpers.calc_vel_profile_brake
 import trajectory_planning_helpers.spline_approximation
 import trajectory_planning_helpers.side_of_line
 import trajectory_planning_helpers.conv_filt
+import trajectory_planning_helpers.path_matching_global
+import trajectory_planning_helpers.path_matching_local
