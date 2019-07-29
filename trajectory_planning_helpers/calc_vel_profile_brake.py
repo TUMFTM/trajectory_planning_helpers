@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import warnings
 
 
 def calc_vel_profile_brake(ggv: np.ndarray,
@@ -26,6 +27,7 @@ def calc_vel_profile_brake(ggv: np.ndarray,
     v_start:        start velocity in m/s.
     mu:             friction coefficients.
     decel_max:      maximum deceleration to be applied (if set to "None", the max. based on ggv and kappa will be used).
+    dyn_model_exp:      exponent used in the vehicle dynamics model (usual range [1.0,2.0]).
 
     Outputs:
     vx_profile:     calculated velocity profile using maximum deceleration of the car.
@@ -45,6 +47,13 @@ def calc_vel_profile_brake(ggv: np.ndarray,
 
     if kappa.size != el_lengths.size + 1:
         raise ValueError("kappa must have the length of el_lengths + 1!")
+
+    if v_start < 0.0:
+        v_start = 0.0
+        warnings.warn('Input v_start was < 0.0. Using v_start = 0.0 instead!')
+
+    if not 1.0 <= dyn_model_exp <= 2.0:
+        warnings.warn('Exponent for the vehicle dynamics model should be in the range [1.0,2.0]!')
 
     # ------------------------------------------------------------------------------------------------------------------
     # PREPARATIONS -----------------------------------------------------------------------------------------------------

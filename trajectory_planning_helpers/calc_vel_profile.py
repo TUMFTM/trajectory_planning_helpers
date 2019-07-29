@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import trajectory_planning_helpers.conv_filt
+import warnings
 
 
 def calc_vel_profile(ggv: np.ndarray,
@@ -31,7 +32,7 @@ def calc_vel_profile(ggv: np.ndarray,
     v_start:            start velocity in m/s (used in unclosed case only).
     v_end:              end velocity in m/s (used in unclosed case only).
     filt_window:        filter window size for moving average filter (must be odd).
-    dyn_model_exp:      exponent used in the vehicle dynamics model.
+    dyn_model_exp:      exponent used in the vehicle dynamics model (usual range [1.0,2.0]).
 
     All inputs must be inserted unclosed, i.e. kappa[-1] != kappa[0], even if closed is set True! (el_lengths is kind of
     closed if closed is True of course!)
@@ -55,6 +56,20 @@ def calc_vel_profile(ggv: np.ndarray,
 
     elif not closed and kappa.size != el_lengths.size + 1:
         raise ValueError("kappa must have the length of el_lengths + 1 if unclosed!")
+
+    if not closed and v_start is None:
+        raise ValueError("v_start must be provided for the unclosed case!")
+
+    if v_start is not None and v_start < 0.0:
+        v_start = 0.0
+        warnings.warn('Input v_start was < 0.0. Using v_start = 0.0 instead!')
+
+    if v_end is not None and v_end < 0.0:
+        v_end = 0.0
+        warnings.warn('Input v_end was < 0.0. Using v_end = 0.0 instead!')
+
+    if not 1.0 <= dyn_model_exp <= 2.0:
+        warnings.warn('Exponent for the vehicle dynamics model should be in the range [1.0,2.0]!')
 
     # ------------------------------------------------------------------------------------------------------------------
     # SPEED PROFILE CALCULATION (FB) -----------------------------------------------------------------------------------
