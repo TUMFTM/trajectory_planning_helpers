@@ -1,5 +1,6 @@
 import numpy as np
 import trajectory_planning_helpers.path_matching_local
+import trajectory_planning_helpers.get_rel_path_part
 import typing
 
 
@@ -26,47 +27,17 @@ def path_matching_global(path_cl: np.ndarray,
     """
 
     # ------------------------------------------------------------------------------------------------------------------
-    # GET RELEVANT PART OF TRAJECTORY FOR EXPECTED S -------------------------------------------------------------------
+    # GET RELEVANT PART OF PATH FOR EXPECTED S -------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------------------------------------
 
     # get s_tot into a variable
     s_tot = path_cl[-1, 0]
 
     if s_expected is not None:
-        # get relevant part of trajectory
-        if s_expected >= s_tot:
-            s_expected -= s_tot
-
-        # set values
-        s_min = s_expected - s_range
-        s_max = s_expected + s_range
-
-        # check for overlapping of two laps
-        if s_min < 0.0:
-            s_min += s_tot
-
-        if s_max > s_tot:
-            s_max -= s_tot
-
-        # now the following holds: s_min -> [0.0; s_tot[ s_max -> ]0.0; s_tot]
-
-        # get indices of according points
-        # - 1 to include trajectory point before s_min
-        ind_start = np.searchsorted(path_cl[:, 0], s_min, side="right") - 1
-        # + 1 to include trajectory point after s_max when slicing
-        ind_stop = np.searchsorted(path_cl[:, 0], s_max, side="left") + 1
-
-        # catch case of reaching into the next lap
-        if ind_start < ind_stop:  # common case
-            path_rel = path_cl[ind_start:ind_stop]
-
-        else:  # overlapping case
-            # temporarily add s_tot to the part in the "next lap" for convenient interpolation afterwards
-            path_rel_part2 = np.copy(path_cl[:ind_stop])
-            path_rel_part2[:, 0] += s_tot
-
-            # :-1 for first part to include last/first point of closed trajectory only once
-            path_rel = np.vstack((path_cl[ind_start:-1], path_rel_part2))
+        path_rel = trajectory_planning_helpers.get_rel_path_part.get_rel_path_part(path_cl=path_cl,
+                                                                                   s_pos=s_expected,
+                                                                                   s_dist_back=s_range,
+                                                                                   s_dist_forw=s_range)
 
         # path must not be considered closed specifically as it is continuous and unclosed by construction
         consider_as_closed = False
