@@ -4,7 +4,9 @@ import numpy as np
 def get_rel_path_part(path_cl: np.ndarray,
                       s_pos: float,
                       s_dist_back: float = 20.0,
-                      s_dist_forw: float = 20.0) -> np.ndarray:
+                      s_dist_forw: float = 20.0,
+                      bound_right_cl: np.ndarray = None,
+                      bound_left_cl: np.ndarray = None) -> tuple:
     """
     Created by:
     Alexander Heilmeier
@@ -15,13 +17,19 @@ def get_rel_path_part(path_cl: np.ndarray,
     backward from this position.
 
     Inputs:
-    path_cl:        Closed path of which we want to extract the relevant part ([s, x, y]).
-    s_pos:          s position of the vehicle in m (matched to the s coordinate of path_cl).
-    s_dist_back:    Backward distance in m from current s position. Including last point before that value!
-    s_dist_forw:    Forward distance in m from current s position. Including first point after that value!
+    path_cl:            Closed path of which we want to extract the relevant part ([s, x, y]).
+    s_pos:              s position of the vehicle in m (matched to the s coordinate of path_cl).
+    s_dist_back:        Backward distance in m from current s position. Including last point before that value!
+    s_dist_forw:        Forward distance in m from current s position. Including first point after that value!
+    bound_right_cl:     Optional input: Right boundary ([x, y]) of path_cl. Every boundary point belongs to the path
+                        point on the same index, i.e. they have the same number of points.
+    bound_left_cl:      Optional input: Right boundary ([x, y]) of path_cl. Every boundary point belongs to the path
+                        point on the same index, i.e. they have the same number of points.
 
     Outputs:
-    path_rel:       Relevant part of the path ([s, x, y]). Attention: s coordinate does not start at 0m!
+    path_rel:           Relevant part of the path ([s, x, y]). Attention: s coordinate does not start at 0m!
+    bound_right_rel:    Relevant part of right boundary ([x, y]). None if not inserted.
+    bound_left_rel:     Relevant part of left boundary ([x, y]). None if not inserted.
     """
 
     # get s_tot into a variable
@@ -30,6 +38,13 @@ def get_rel_path_part(path_cl: np.ndarray,
     # check distance input
     if s_dist_back + s_dist_forw >= s_tot:
         raise ValueError('Summed distance inputs are greater or equal to the total distance of the given path!')
+
+    # check boundaries
+    if bound_right_cl is not None and bound_right_cl.shape[0] != path_cl.shape[0]:
+        raise ValueError('Inserted right boundary does not have the same number of points as the path!')
+
+    if bound_left_cl is not None and bound_left_cl.shape[0] != path_cl.shape[0]:
+        raise ValueError('Inserted left boundary does not have the same number of points as the path!')
 
     # cut s position if it exceeds the path length
     if s_pos >= s_tot:
@@ -49,25 +64,45 @@ def get_rel_path_part(path_cl: np.ndarray,
 
     # get indices of according points
     # - 1 to include trajectory point before s_min
-    ind_start = np.searchsorted(path_cl[:, 0], s_min, side="right") - 1
+    idx_start = np.searchsorted(path_cl[:, 0], s_min, side="right") - 1
     # + 1 to include trajectory point after s_max when slicing
-    ind_stop = np.searchsorted(path_cl[:, 0], s_max, side="left") + 1
+    idx_stop = np.searchsorted(path_cl[:, 0], s_max, side="left") + 1
 
     # catch case of reaching into the next lap
-    if ind_start < ind_stop:
+    if idx_start < idx_stop:
         # common case
-        path_rel = path_cl[ind_start:ind_stop]
+        path_rel = path_cl[idx_start:idx_stop]
+
+        if bound_right_cl is not None:
+            bound_right_rel = bound_right_cl[idx_start:idx_stop]
+        else:
+            bound_right_rel = None
+
+        if bound_left_cl is not None:
+            bound_left_rel = bound_left_cl[idx_start:idx_stop]
+        else:
+            bound_left_rel = None
 
     else:
         # overlapping case
         # temporarily add s_tot to the part in the "next lap" for convenient interpolation afterwards
-        path_rel_part2 = np.copy(path_cl[:ind_stop])
+        path_rel_part2 = np.copy(path_cl[:idx_stop])
         path_rel_part2[:, 0] += s_tot
 
         # :-1 for first part to include last/first point of closed trajectory only once
-        path_rel = np.vstack((path_cl[ind_start:-1], path_rel_part2))
+        path_rel = np.vstack((path_cl[idx_start:-1], path_rel_part2))
 
-    return path_rel
+        if bound_right_cl is not None:
+            bound_right_rel = np.vstack((bound_right_cl[idx_start:-1], bound_right_cl[:idx_stop]))
+        else:
+            bound_right_rel = None
+
+        if bound_left_cl is not None:
+            bound_left_rel = np.vstack((bound_left_cl[idx_start:-1], bound_left_cl[:idx_stop]))
+        else:
+            bound_left_rel = None
+
+    return path_rel, bound_right_rel, bound_left_rel
 
 
 # testing --------------------------------------------------------------------------------------------------------------

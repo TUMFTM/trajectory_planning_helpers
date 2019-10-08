@@ -37,7 +37,7 @@ def path_matching_global(path_cl: np.ndarray,
         path_rel = trajectory_planning_helpers.get_rel_path_part.get_rel_path_part(path_cl=path_cl,
                                                                                    s_pos=s_expected,
                                                                                    s_dist_back=s_range,
-                                                                                   s_dist_forw=s_range)
+                                                                                   s_dist_forw=s_range)[0]
 
         # path must not be considered closed specifically as it is continuous and unclosed by construction
         consider_as_closed = False
