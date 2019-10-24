@@ -221,7 +221,7 @@ def __solver_fb_closed(ggv: np.ndarray,
                                                 el_lengths=el_lengths_double,
                                                 mu=mu_double,
                                                 vx_profile=vx_profile_double,
-                                                rev_dir=True,
+                                                rev_dir=False,
                                                 dyn_model_exp=dyn_model_exp,
                                                 drag_coeff=drag_coeff,
                                                 m_veh=m_veh)
