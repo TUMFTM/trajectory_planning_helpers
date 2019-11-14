@@ -113,10 +113,10 @@ def iqp_handler(reftrack: np.ndarray,
         reftrack_tmp[:, 2] -= alpha_mincurv_tmp
         reftrack_tmp[:, 3] += alpha_mincurv_tmp
 
-        ws_track_tmp = tph.interp_track_widths.interp_w_track(w_track=reftrack_tmp[:, 2:4],
-                                                              spline_inds=spline_inds_tmp,
-                                                              t_vals=t_values_tmp,
-                                                              incl_last_point=False)
+        ws_track_tmp = tph.interp_track_widths.interp_track_widths(w_track=reftrack_tmp[:, 2:4],
+                                                                   spline_inds=spline_inds_tmp,
+                                                                   t_values=t_values_tmp,
+                                                                   incl_last_point=False)
 
         # create new reftrack
         reftrack_tmp = np.column_stack((refline_tmp, ws_track_tmp))
