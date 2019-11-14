@@ -16,10 +16,15 @@ not work properly on a common street network.
 * `calc_vel_profile`: Calculate velocity profile on the basis of a forward/backward solver.
 * `calc_vel_profile_brake`: Calculate velocity profile on the basis of a pure forward solver.
 * `conv_filt`: Filter a given signal using a 1D convolution (moving average) filter.
+* `create_raceline`: Function to create a raceline on the basis of the reference line and an optimization result.
 * `get_rel_path_part`: Get relevant part of a given path on the basis of a s position and a specified range.
 * `import_ggv`: Import the ggv diagram containing vehicle handling limits from a text file.
 * `interp_splines`: Interpolate splines to get points with a desired stepsize.
+* `interp_track_widths`: Interpolation function for track widths.
+* `iqp_handler`: Handler function to iteratively call the minimum curvature optimization.
 * `normalize_psi`: Normalize heading psi such that the interval [-pi, pi[ holds.
+* `opt_min_curv`: Minimum curvature optimization.
+* `opt_shortest_path`: Shortest path optimization.
 * `path_matching_global`: Match own vehicle position to a global (i.e. closed) path.
 * `path_matching_local`: Match own vehicle position to a local (i.e. unclosed) path.
 * `progressbar`: Commandline progressbar (to be called in a for loop).
