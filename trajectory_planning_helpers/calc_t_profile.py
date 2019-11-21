@@ -8,10 +8,10 @@ def calc_t_profile(vx_profile: np.ndarray,
                    t_start: float = 0.0,
                    ax_profile=None) -> np.ndarray:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     Calculate a temporal duration profile for a given trajectory.
 
     Inputs:

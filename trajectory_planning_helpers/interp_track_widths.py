@@ -6,10 +6,10 @@ def interp_track_widths(w_track: np.ndarray,
                         t_values: np.ndarray,
                         incl_last_point: bool = False) -> np.ndarray:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     The function (linearly) interpolates the track widths in the same steps as the splines were interpolated before.
 
     Keep attention that the (multiple) interpolation of track widths can lead to unwanted effects, e.g. that peaks

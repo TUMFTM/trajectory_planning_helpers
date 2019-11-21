@@ -7,10 +7,10 @@ def create_raceline(refline: np.ndarray,
                     alpha: np.ndarray,
                     stepsize_interp: float) -> tuple:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     This function includes the algorithm part connected to the interpolation of the raceline after the optimization.
 
     Inputs:

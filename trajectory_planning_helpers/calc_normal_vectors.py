@@ -5,10 +5,10 @@ import trajectory_planning_helpers.normalize_psi
 
 def calc_normal_vectors(psi_vel: np.ndarray) -> np.ndarray:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     Use heading to provide normalized (i.e. unit length) normal vectors.
 
     Inputs:

@@ -10,10 +10,10 @@ def interp_splines(coeffs_x: np.ndarray,
                    stepsize_approx: float = None,
                    stepnum_fixed: list = None) -> tuple:
     """
-    Created by:
+    Author:
     Alexander Heilmeier & Tim Stahl
 
-    Documentation:
+    Description:
     Interpolate points on one or more splines with third order. The last point (i.e. t = 0)
     can be included if option is set accordingly. The algorithm keeps stepsize_approx as good as possible.
     ws_track can be inserted optionally and should contain [w_tr_right, w_tr_left].

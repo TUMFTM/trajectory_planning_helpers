@@ -5,13 +5,13 @@ def conv_filt(signal: np.ndarray,
               filt_window: int,
               closed: bool) -> np.ndarray:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
     Modified by:
     Tim Stahl
 
-    Documentation:
+    Description:
     Filter a given temporal signal using a convolution (moving average) filter.
 
     Inputs:

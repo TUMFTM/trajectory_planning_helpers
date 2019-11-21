@@ -1,6 +1,5 @@
 import numpy as np
 import math
-import warnings
 
 
 def calc_vel_profile_brake(ggv: np.ndarray,
@@ -13,13 +12,13 @@ def calc_vel_profile_brake(ggv: np.ndarray,
                            drag_coeff: float = 0.85,
                            m_veh: float = 1160.0) -> np.ndarray:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
     Modified by:
     Tim Stahl
 
-    Documentation:
+    Description:
     Calculate brake (may also be emergency) velocity profile based on a local trajectory.
 
     Inputs:
@@ -55,10 +54,10 @@ def calc_vel_profile_brake(ggv: np.ndarray,
 
     if v_start < 0.0:
         v_start = 0.0
-        warnings.warn('Input v_start was < 0.0. Using v_start = 0.0 instead!')
+        print('WARNING: Input v_start was < 0.0. Using v_start = 0.0 instead!')
 
     if not 1.0 <= dyn_model_exp <= 2.0:
-        warnings.warn('Exponent for the vehicle dynamics model should be in the range [1.0,2.0]!')
+        print('WARNING: Exponent for the vehicle dynamics model should be in the range [1.0,2.0]!')
 
     # ------------------------------------------------------------------------------------------------------------------
     # PREPARATIONS -----------------------------------------------------------------------------------------------------

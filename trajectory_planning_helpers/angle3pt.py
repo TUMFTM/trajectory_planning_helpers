@@ -7,10 +7,10 @@ def angle3pt(a: Union[tuple, np.ndarray],
              b: Union[tuple, np.ndarray],
              c: Union[tuple, np.ndarray]) -> float:
     """
-    Created by:
+    Author:
     Tim Stahl
 
-    Documentation:
+    Description:
     Calculates angle by turning from a to c around b.
 
     Inputs:

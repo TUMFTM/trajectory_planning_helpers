@@ -14,10 +14,10 @@ def iqp_handler(reftrack: np.ndarray,
                 curv_error_allowed: float = 0.01) -> tuple:
 
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     This function handles the iterative call of the quadratic optimization problem (minimum curvature) during
     trajectory optimization. The interface to this function was kept as similar as possible to the interface of
     opt_min_curv.py.

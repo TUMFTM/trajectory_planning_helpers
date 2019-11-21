@@ -8,10 +8,10 @@ def get_rel_path_part(path_cl: np.ndarray,
                       bound_right_cl: np.ndarray = None,
                       bound_left_cl: np.ndarray = None) -> tuple:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     This function returns the relevant part of a closed path (e.g. on the racetrack) on the basis of a given s position.
     The distances s_dist_forw and s_dist_backw are used to determine how much the path should reach forward and
     backward from this position.

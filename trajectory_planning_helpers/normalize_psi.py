@@ -5,10 +5,10 @@ from typing import Union
 
 def normalize_psi(psi: Union[np.ndarray, float]) -> np.ndarray:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     Normalize heading psi such that [-pi,pi[ holds as interval boundaries.
 
     Inputs:

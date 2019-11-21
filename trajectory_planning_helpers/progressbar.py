@@ -8,10 +8,10 @@ def progressbar(i: int,
                 decimals: int = 1,
                 length: int = 50) -> None:
     """
-    Created by:
+    Author:
     Tim Stahl
 
-    Documentation:
+    Description:
     Commandline progressbar (to be called in a for loop).
 
     Input:

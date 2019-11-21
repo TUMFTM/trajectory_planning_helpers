@@ -13,13 +13,13 @@ def spline_approximation(track: np.ndarray,
                          stepsize_reg: float = 3.0,
                          debug: bool = False) -> np.ndarray:
     """
-    Created by:
+    Author:
     Fabian Christ
 
     Modified by:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     Smooth spline approximation for a track (e.g. centerline, reference line).
 
     Inputs:

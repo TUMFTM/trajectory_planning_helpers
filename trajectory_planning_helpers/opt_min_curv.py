@@ -14,10 +14,10 @@ def opt_min_curv(reftrack: np.ndarray,
                  print_debug: bool = False,
                  plot_debug: bool = False) -> tuple:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     This function uses a QP solver to minimize the summed curvature of a path by moving the path points along their
     normal vectors within the track width.
 

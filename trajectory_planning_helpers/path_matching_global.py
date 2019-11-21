@@ -9,10 +9,10 @@ def path_matching_global(path_cl: np.ndarray,
                          s_expected: typing.Union[float, None] = None,
                          s_range: float = 20.0) -> tuple:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     Get the corresponding s coordinate and the displacement of the own vehicle in relation to the global path.
 
     Inputs:
@@ -25,6 +25,13 @@ def path_matching_global(path_cl: np.ndarray,
     s_interp:       Interpolated s position of the vehicle in m. The following holds: s_interp in range [0.0,s_tot[.
     d_displ:        Estimated displacement from the trajectory in m.
     """
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # CHECK INPUT ------------------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------------------------------
+
+    if path_cl.shape[1] != 3:
+        raise ValueError("Inserted path must have 3 columns [s, x, y]!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # GET RELEVANT PART OF PATH FOR EXPECTED S -------------------------------------------------------------------------

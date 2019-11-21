@@ -3,10 +3,10 @@ import numpy as np
 
 def import_ggv(ggv_import_path: str) -> np.ndarray:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     This function imports our vehicle ggv diagram consisting of the columns
     [vx, ax_max_emotors, ax_max_tires, ax_min_tires, ay_max_tires]
 

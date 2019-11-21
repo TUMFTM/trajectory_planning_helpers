@@ -6,10 +6,10 @@ def side_of_line(a: Union[tuple, np.ndarray],
                  b: Union[tuple, np.ndarray],
                  z: Union[tuple, np.ndarray]) -> float:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     Function determines if a point z is on the left or right side of a line from a to b. It is based on the z component
     orientation of the cross product, see question on
     https://stackoverflow.com/questions/1560492/how-to-tell-whether-a-point-is-to-the-right-or-left-side-of-a-line

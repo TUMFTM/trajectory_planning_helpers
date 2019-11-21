@@ -8,10 +8,10 @@ def calc_splines(path: np.ndarray,
                  psi_e: float = None,
                  use_dist_scaling: bool = True) -> tuple:
     """
-    Created by:
+    Author:
     Tim Stahl & Alexander Heilmeier
 
-    Documentation:
+    Description:
     Solve for a curvature continous cubic spline between given poses
 
                     P_{x,y}   = a3 *t³ + a2 *t² + a1*t + a0

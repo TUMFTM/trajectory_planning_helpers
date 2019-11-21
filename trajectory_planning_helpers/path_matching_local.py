@@ -8,10 +8,10 @@ def path_matching_local(path: np.ndarray,
                         consider_as_closed: bool = False,
                         s_tot: typing.Union[float, None] = None) -> tuple:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     Get the corresponding s coordinate and the displacement of the own vehicle in relation to a local path.
 
     Inputs:
@@ -29,6 +29,9 @@ def path_matching_local(path: np.ndarray,
     # ------------------------------------------------------------------------------------------------------------------
     # CHECK INPUT ------------------------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------------------------------------
+
+    if path.shape[1] != 3:
+        raise ValueError("Inserted path must have 3 columns [s, x, y]!")
 
     if consider_as_closed and s_tot is None:
         print("WARNING: s_tot is not handed into path_matching_local function! Estimating s_tot on the basis of equal"

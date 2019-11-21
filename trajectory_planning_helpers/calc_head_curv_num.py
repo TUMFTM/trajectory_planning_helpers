@@ -12,10 +12,10 @@ def calc_head_curv_num(path: np.ndarray,
                        stepsize_curv_review: float = 2.0,
                        calc_curv: bool = True) -> tuple:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     Numerical calculation of heading psi and curvature kappa on the basis of a given path.
 
     Inputs:

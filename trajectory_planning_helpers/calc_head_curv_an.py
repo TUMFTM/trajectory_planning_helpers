@@ -9,10 +9,10 @@ def calc_head_curv_an(coeffs_x: np.ndarray,
                       t_spls: np.ndarray,
                       calc_curv: bool = True) -> tuple:
     """
-    Created by:
+    Author:
     Alexander Heilmeier
 
-    Documentation:
+    Description:
     Analytical calculation of heading psi and curvature kappa on the basis of third order splines for x- and
     y-coordinate.
 
