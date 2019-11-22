@@ -11,10 +11,10 @@ def import_ggv(ggv_import_path: str) -> np.ndarray:
     [vx, ax_max_emotors, ax_max_tires, ax_min_tires, ay_max_tires]
 
     Inputs:
-    ggv_import_path:    Path to the ggv text file.
+    ggv_import_path:    Path to the ggv csv file.
 
     Outputs:
-    ggv:                ggv diagram as np array.
+    ggv:                ggv diagram.
     """
 
     # load ggv
@@ -33,7 +33,7 @@ def import_ggv(ggv_import_path: str) -> np.ndarray:
     bool_5 = ggv[:, 4] < 0.0
 
     if np.any(bool_1) or np.any(bool_2) or np.any(bool_3) or np.any(bool_4) or np.any(bool_5):
-        raise ValueError("ggv diagram seens unreasonable!")
+        raise ValueError("ggv diagram seems unreasonable!")
 
     return ggv
 
