@@ -7,11 +7,11 @@ def calc_vel_profile_brake(ggv: np.ndarray,
                            kappa: np.ndarray,
                            el_lengths: np.ndarray,
                            v_start: float,
+                           dyn_model_exp: float,
+                           drag_coeff: float,
+                           m_veh: float,
                            mu: np.ndarray = None,
-                           decel_max: float = None,
-                           dyn_model_exp: float = 1.0,
-                           drag_coeff: float = 0.85,
-                           m_veh: float = 1160.0) -> np.ndarray:
+                           decel_max: float = None) -> np.ndarray:
     """
     Author:
     Alexander Heilmeier

@@ -7,13 +7,13 @@ def calc_vel_profile(ggv: np.ndarray,
                      kappa: np.ndarray,
                      el_lengths: np.ndarray,
                      closed: bool,
+                     dyn_model_exp: float,
+                     drag_coeff: float,
+                     m_veh: float,
                      mu: np.ndarray = None,
                      v_start: float = None,
                      v_end: float = None,
-                     filt_window: int = None,
-                     dyn_model_exp: float = 1.0,
-                     drag_coeff: float = 0.85,
-                     m_veh: float = 1160.0) -> np.ndarray:
+                     filt_window: int = None) -> np.ndarray:
     """
     Author:
     Alexander Heilmeier
