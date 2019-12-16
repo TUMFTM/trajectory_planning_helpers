@@ -7,9 +7,9 @@ def calc_vel_profile_brake(ggv: np.ndarray,
                            kappa: np.ndarray,
                            el_lengths: np.ndarray,
                            v_start: float,
-                           dyn_model_exp: float,
                            drag_coeff: float,
                            m_veh: float,
+                           dyn_model_exp: float = 1.0,
                            mu: np.ndarray = None,
                            decel_max: float = None) -> np.ndarray:
     """
@@ -23,8 +23,9 @@ def calc_vel_profile_brake(ggv: np.ndarray,
     Calculate brake (may also be emergency) velocity profile based on a local trajectory.
 
     Inputs:
-    ggv:            ggv-diagram to be applied: [v, ax_max_machines, ax_max_tires, ax_min_tires, ay_max_tires].
-                    ax_max_machines should be handed in without considering drag resistance!
+    ggv:            ggv-diagram to be applied: [vx, ax_max_machines, ax_max_tires, ay_max_tires].
+                    ax_max_machines should be handed in without considering drag resistance! The last row's vx is
+                    assumed to be the maximum velocity of the car!
     kappa:          curvature profile of given trajectory in rad/m.
     el_lengths:     element lengths (distances between coordinates) of given trajectory.
     v_start:        start velocity in m/s.
@@ -60,6 +61,10 @@ def calc_vel_profile_brake(ggv: np.ndarray,
     if not 1.0 <= dyn_model_exp <= 2.0:
         print('WARNING: Exponent for the vehicle dynamics model should be in the range [1.0,2.0]!')
 
+    if ggv.shape[1] != 4:
+        raise ValueError("ggv diagram must consist of the four columns [vx, ax_max_emotors, ax_max_tires,"
+                         " ay_max_tires]!")
+
     # ------------------------------------------------------------------------------------------------------------------
     # PREPARATIONS -----------------------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------------------------------------
@@ -83,10 +88,12 @@ def calc_vel_profile_brake(ggv: np.ndarray,
 
     for i in range(no_points - 1):
 
-        # calculat longitudinal acceleration
+        # calculate longitudinal acceleration
+        ggv_mod = np.copy(ggv)
+        ggv_mod[:, 2] *= -1.0  # use negative acceleration in x axis for forward deceleration
         ax_final = trajectory_planning_helpers.calc_vel_profile.calc_ax_poss(vx_start=vx_profile[i],
                                                                              radius=radii[i],
-                                                                             ggv=ggv[:, [0, 1, 3, 4]],
+                                                                             ggv=ggv_mod,
                                                                              mu=mu[i],
                                                                              mode='decel_forw',
                                                                              dyn_model_exp=dyn_model_exp,
