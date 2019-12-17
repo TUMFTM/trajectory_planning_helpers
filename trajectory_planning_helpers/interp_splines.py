@@ -10,29 +10,41 @@ def interp_splines(coeffs_x: np.ndarray,
                    stepsize_approx: float = None,
                    stepnum_fixed: list = None) -> tuple:
     """
-    Author:
+    author:
     Alexander Heilmeier & Tim Stahl
 
-    Description:
+    .. description::
     Interpolate points on one or more splines with third order. The last point (i.e. t = 0)
     can be included if option is set accordingly. The algorithm keeps stepsize_approx as good as possible.
     ws_track can be inserted optionally and should contain [w_tr_right, w_tr_left].
 
-    Inputs:
-    coeffs_x:           coefficient matrix of the x splines with size (no_splines x 4).
-    coeffs_y:           coefficient matrix of the y splines with size (no_splines x 4).
-    spline_lengths:     array containing the lengths of the inserted splines with size (no_splines x 1).
-    incl_last_point:    flag to set if last point should be kept or removed before return.
-    stepsize_approx:    desired stepsize of the points after interpolation.                          \\ Provide only one
-    stepnum_fixed:      return a fixed number of coordinates per spline, list of length no_splines.  \\ of these two!
+    .. inputs::
+    :param coeffs_x:        coefficient matrix of the x splines with size (no_splines x 4).
+    :type coeffs_x:         np.ndarray
+    :param coeffs_y:        coefficient matrix of the y splines with size (no_splines x 4).
+    :type coeffs_y:         np.ndarray
+    :param spline_lengths:  array containing the lengths of the inserted splines with size (no_splines x 1).
+    :type spline_lengths:   np.ndarray
+    :param incl_last_point: flag to set if last point should be kept or removed before return.
+    :type incl_last_point:  bool
+    :param stepsize_approx: desired stepsize of the points after interpolation.                      \\ Provide only one
+    :type stepsize_approx:  float
+    :param stepnum_fixed:   return a fixed number of coordinates per spline, list of length no_splines. \\ of these two!
+    :type stepnum_fixed:    list
 
-    Outputs:
-    path_interp:        interpolated path points.
-    spline_inds:        contains the indices of the splines that hold the interpolated points.
-    t_values:           containts the relative spline coordinate values (t) of every point on the splines.
-    dists_interp:       total distance up to every interpolation point.
+    .. outputs::
+    :return path_interp:    interpolated path points.
+    :rtype path_interp:     np.ndarray
+    :return spline_inds:    contains the indices of the splines that hold the interpolated points.
+    :rtype spline_inds:     np.ndarray
+    :return t_values:       containts the relative spline coordinate values (t) of every point on the splines.
+    :rtype t_values:        np.ndarray
+    :return dists_interp:   total distance up to every interpolation point.
+    :rtype dists_interp:    np.ndarray
 
+    .. notes::
     len(coeffs_x) = len(coeffs_y) = len(spline_lengths)
+
     len(path_interp = len(spline_inds) = len(t_values) = len(dists_interp)
     """
 

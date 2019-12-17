@@ -5,24 +5,29 @@ def conv_filt(signal: np.ndarray,
               filt_window: int,
               closed: bool) -> np.ndarray:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Modified by:
+    modified by:
     Tim Stahl
 
-    Description:
+    .. description::
     Filter a given temporal signal using a convolution (moving average) filter.
 
-    Inputs:
-    signal:         temporal signal that should be filtered (always unclosed).
-    filt_window:    filter window size for moving average filter (must be odd).
-    closed:         flag showing if the signal can be considered as closable, e.g. for velocity profiles.
+    .. inputs::
+    :param signal:          temporal signal that should be filtered (always unclosed).
+    :type signal:           np.ndarray
+    :param filt_window:     filter window size for moving average filter (must be odd).
+    :type filt_window:      int
+    :param closed:          flag showing if the signal can be considered as closable, e.g. for velocity profiles.
+    :type closed:           bool
 
+    .. outputs::
+    :return signal_filt:    filtered input signal (always unclosed).
+    :rtype signal_filt:     np.ndarray
+
+    .. notes::
     signal input is always unclosed!
-
-    Outputs:
-    signal_filt:    filtered input signal (always unclosed).
 
     len(signal) = len(signal_filt)
     """

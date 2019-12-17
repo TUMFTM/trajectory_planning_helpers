@@ -9,10 +9,10 @@ def opt_shortest_path(reftrack: np.ndarray,
                       w_veh: float,
                       print_debug: bool = False) -> np.ndarray:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Description:
+    .. description::
     This function uses a QP solver to minimize the summed length of a path by moving the path points along their
     normal vectors within the track width.
 
@@ -21,17 +21,22 @@ def opt_shortest_path(reftrack: np.ndarray,
     Race Driver Model
     DOI: 10.1016/j.compstruc.2007.04.028
 
-    Inputs:
-    reftrack:       array containing the reference track, i.e. a reference line and the according track widths to the
-                        right and to the left [x, y, w_tr_right, w_tr_left] (unit is meter, must be unclosed!)
-    normvectors:    normalized normal vectors for every point of the reference track [x_component, y_component]
-                        (unit is meter, must be unclosed!)
-    w_veh:          vehicle width in m. It is considered during the calculation of the allowed deviations from the
-                        reference line.
-    print_debug:    bool flag to print debug messages.
+    .. inputs::
+    :param reftrack:        array containing the reference track, i.e. a reference line and the according track widths
+                            to the right and to the left [x, y, w_tr_right, w_tr_left] (unit is meter, must be unclosed)
+    :type reftrack:         np.ndarray
+    :param normvectors:     normalized normal vectors for every point of the reference track [x_component, y_component]
+                            (unit is meter, must be unclosed!)
+    :type normvectors:      np.ndarray
+    :param w_veh:           vehicle width in m. It is considered during the calculation of the allowed deviations from
+                            the reference line.
+    :type w_veh:            float
+    :param print_debug:     bool flag to print debug messages.
+    :type print_debug:      bool
 
-    Outputs:
-    alpha_shpath:   solution vector of the optimization problem containing the lateral shift in m for every point.
+    .. outputs::
+    :return alpha_shpath:   solution vector of the optimization problem containing lateral shift in m for every point.
+    :rtype alpha_shpath:    np.ndarray
     """
 
     # ------------------------------------------------------------------------------------------------------------------

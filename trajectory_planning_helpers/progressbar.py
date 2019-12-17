@@ -8,19 +8,25 @@ def progressbar(i: int,
                 decimals: int = 1,
                 length: int = 50) -> None:
     """
-    Author:
+    author:
     Tim Stahl
 
-    Description:
+    .. description::
     Commandline progressbar (to be called in a for loop).
 
-    Input:
-    i:                    current iteration / progress index.
-    i_total:              maximum iteration number / progress (where 100% should be reached).
-    prefix:               prefix string to be displayed right in front of progressbar.
-    suffix:               suffix string to be displayed behind the progressbar.
-    decimals:             number of decimals behind comma (of printed percentage).
-    length:               length of progressbar (in character spaces).
+    .. inputs::
+    :param i:           current iteration / progress index.
+    :type i:            int
+    :param i_total:     maximum iteration number / progress (where 100% should be reached).
+    :type i_total:      int
+    :param prefix:      prefix string to be displayed right in front of progressbar.
+    :type prefix:       str
+    :param suffix:      suffix string to be displayed behind the progressbar.
+    :type suffix:       str
+    :param decimals:    number of decimals behind comma (of printed percentage).
+    :type decimals:     int
+    :param length:      length of progressbar (in character spaces).
+    :type length:       int
     """
 
     # Calculate current percentage based on i and i_total

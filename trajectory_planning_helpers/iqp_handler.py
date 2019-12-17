@@ -14,10 +14,10 @@ def iqp_handler(reftrack: np.ndarray,
                 curv_error_allowed: float = 0.01) -> tuple:
 
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Description:
+    .. description::
     This function handles the iterative call of the quadratic optimization problem (minimum curvature) during
     trajectory optimization. The interface to this function was kept as similar as possible to the interface of
     opt_min_curv.py.
@@ -33,31 +33,46 @@ def iqp_handler(reftrack: np.ndarray,
     Minimum Curvature Trajectory Planning and Control for an Autonomous Racecar
     DOI: 10.1080/00423114.2019.1631455
 
-    Inputs:
-    reftrack:       array containing the reference track, i.e. a reference line and the according track widths to the
-                        right and to the left [x, y, w_tr_right, w_tr_left] (unit is meter, must be unclosed!)
-    normvectors:    normalized normal vectors for every point of the reference track [x_component, y_component]
-                        (unit is meter, must be unclosed!)
-    A:              linear equation system matrix for splines (applicable for both, x and y direction)
-                        -> System matrices have the form a_i, b_i * t, c_i * t^2, d_i * t^3
-                        -> see calc_splines.py for further information or to obtain this matrix
-    kappa_bound:    curvature boundary to consider during optimization.
-    w_veh:          vehicle width in m. It is considered during the calculation of the allowed deviations from the
-                        reference line.
-    print_debug:    bool flag to print debug messages.
-    plot_debug:     bool flag to plot the curvatures that are calculated based on the original linearization and on a
-                        linearization around the solution.
-    stepsize_interp: stepsize in meters which is used for an interpolation after the spline approximation. This stepsize
-                        determines the steps within the optimization problem.
-    iters_min:      number if minimum iterations of the IQP (termination criterion).
-    curv_error_allowed: allowed curvature error in rad/m between the original linearization and the linearization around
-                            the solution (termination criterion).
+    .. inputs::
+    :param reftrack:            array containing the reference track, i.e. a reference line and the according track
+                                widths to the right and to the left [x, y, w_tr_right, w_tr_left] (unit is meter, must
+                                be unclosed!)
+    :type reftrack:             np.ndarray
+    :param normvectors:         normalized normal vectors for every point of the reference track [x, y]
+                                (unit is meter, must be unclosed!)
+    :type normvectors:          np.ndarray
+    :param A:                   linear equation system matrix for splines (applicable for both, x and y direction)
+                                -> System matrices have the form a_i, b_i * t, c_i * t^2, d_i * t^3
+                                -> see calc_splines.py for further information or to obtain this matrix
+    :type A:                    np.ndarray
+    :param kappa_bound:         curvature boundary to consider during optimization.
+    :type kappa_bound:          float
+    :param w_veh:               vehicle width in m. It is considered during the calculation of the allowed deviations
+                                from the reference line.
+    :type w_veh:                float
+    :param print_debug:         bool flag to print debug messages.
+    :type print_debug:          bool
+    :param plot_debug:          bool flag to plot the curvatures that are calculated based on the original linearization
+                                and on a linearization around the solution.
+    :type plot_debug:           bool
+    :param stepsize_interp:     stepsize in meters which is used for an interpolation after the spline approximation.
+                                This stepsize determines the steps within the optimization problem.
+    :type stepsize_interp:      float
+    :param iters_min:           number if minimum iterations of the IQP (termination criterion).
+    :type iters_min:            int
+    :param curv_error_allowed:  allowed curvature error in rad/m between the original linearization and the
+                                linearization around the solution (termination criterion).
+    :type curv_error_allowed:   float
 
-    Outputs:
-    alpha_mincurv_tmp:  solution vector of the optimization problem containing the lateral shift in m for every point.
-    reftrack_tmp:       reference track data [x, y, w_tr_right, w_tr_left] as it was used in the final iteration of the
-                            IQP.
-    normvectors_tmp:    normalized normal vectors as they were used in the final iteration of the IQP.
+    .. outputs::
+    :return alpha_mincurv_tmp:  solution vector of the optimization problem containing the lateral shift in m for every
+                                point.
+    :rtype alpha_mincurv_tmp:   np.ndarray
+    :return reftrack_tmp:       reference track data [x, y, w_tr_right, w_tr_left] as it was used in the final iteration
+                                of the IQP.
+    :rtype reftrack_tmp:        np.ndarray
+    :return normvectors_tmp:    normalized normal vectors as they were used in the final iteration of the IQP [x, y].
+    :rtype normvectors_tmp:     np.ndarray
     """
 
     # ------------------------------------------------------------------------------------------------------------------

@@ -1,29 +1,35 @@
 import numpy as np
 import trajectory_planning_helpers.angle3pt
-import typing
+from typing import Union
 
 
 def path_matching_local(path: np.ndarray,
                         ego_position: np.ndarray,
                         consider_as_closed: bool = False,
-                        s_tot: typing.Union[float, None] = None) -> tuple:
+                        s_tot: Union[float, None] = None) -> tuple:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Description:
+    .. description::
     Get the corresponding s coordinate and the displacement of the own vehicle in relation to a local path.
 
-    Inputs:
-    path:               Unclosed path used to match ego position ([s, x, y]).
-    ego_position:       Ego position of the vehicle ([x, y]).
-    consider_as_closed: If the path is closed in reality we can interpolate between last and first point. This can be
-                        enforced by setting consider_as_closed = True.
-    s_tot:              Total length of path in m.
+    .. inputs::
+    :param path:                Unclosed path used to match ego position ([s, x, y]).
+    :type path:                 np.ndarray
+    :param ego_position:        Ego position of the vehicle ([x, y]).
+    :type ego_position:         np.ndarray
+    :param consider_as_closed:  If the path is closed in reality we can interpolate between last and first point. This
+                                can be enforced by setting consider_as_closed = True.
+    :type consider_as_closed:   bool
+    :param s_tot:               Total length of path in m.
+    :type s_tot:                Union[float, None]
 
-    Outputs:
-    s_interp:           Interpolated s position of the vehicle in m.
-    d_displ:            Estimated displacement from the trajectory in m.
+    .. outputs::
+    :return s_interp:           Interpolated s position of the vehicle in m.
+    :rtype s_interp:            np.ndarray
+    :return d_displ:            Estimated displacement from the trajectory in m.
+    :rtype d_displ:             np.ndarray
     """
 
     # ------------------------------------------------------------------------------------------------------------------

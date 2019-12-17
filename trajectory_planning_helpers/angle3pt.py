@@ -7,17 +7,23 @@ def angle3pt(a: Union[tuple, np.ndarray],
              b: Union[tuple, np.ndarray],
              c: Union[tuple, np.ndarray]) -> float:
     """
-    Author:
+    author:
     Tim Stahl
 
-    Description:
+    .. description::
     Calculates angle by turning from a to c around b.
 
-    Inputs:
-    a, b, c:        point coordinates [x, y].
+    .. inputs::
+    :param a:       point coordinates [x, y]
+    :type a:        Union[tuple, np.ndarray]
+    :param b:       point coordinates [x, y]
+    :type b:        Union[tuple, np.ndarray]
+    :param c:       point coordinates [x, y]
+    :type c:        Union[tuple, np.ndarray]
 
-    Outputs:
-    ang:            angle in the range [-pi,pi[.
+    .. outputs::
+    :return ang:    angle in the range [-pi,pi[
+    :rtype ang:     float
     """
 
     ang = math.atan2(c[1] - b[1], c[0] - b[0]) - math.atan2(a[1] - b[1], a[0] - b[0])

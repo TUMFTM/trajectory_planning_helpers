@@ -6,24 +6,31 @@ import trajectory_planning_helpers.calc_ax_profile
 def calc_t_profile(vx_profile: np.ndarray,
                    el_lengths: np.ndarray,
                    t_start: float = 0.0,
-                   ax_profile=None) -> np.ndarray:
+                   ax_profile: np.ndarray = None) -> np.ndarray:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Description:
+    .. description::
     Calculate a temporal duration profile for a given trajectory.
 
-    Inputs:
-    vx_profile:     array containing the velocity profile.
-    el_lengths:     array containing the element lengths between every point of the velocity profile.
-    t_start:        start time in seconds added to first array element.
-    ax_profile:     acceleration profile fitting to the velocity profile.
+    .. inputs::
+    :param vx_profile:  array containing the velocity profile.
+    :type vx_profile:   np.ndarray
+    :param el_lengths:  array containing the element lengths between every point of the velocity profile.
+    :type el_lengths:   np.ndarray
+    :param t_start:     start time in seconds added to first array element.
+    :type t_start:      float
+    :param ax_profile:  acceleration profile fitting to the velocity profile.
+    :type ax_profile:   np.ndarray
 
-    Outputs:
-    t_profile:      time profile for the given velocity profile.
+    .. outputs::
+    :return t_profile:  time profile for the given velocity profile.
+    :rtype t_profile:   np.ndarray
 
+    .. notes::
     len(el_lengths) + 1 = len(t_profile)
+
     len(vx_profile) and len(ax_profile) must be >= len(el_lengths) as the temporal duration from one point to the next
     is only calculated based on the previous point.
     """

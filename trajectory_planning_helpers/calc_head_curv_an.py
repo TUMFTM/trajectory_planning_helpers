@@ -9,24 +9,32 @@ def calc_head_curv_an(coeffs_x: np.ndarray,
                       t_spls: np.ndarray,
                       calc_curv: bool = True) -> tuple:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Description:
+    .. description::
     Analytical calculation of heading psi and curvature kappa on the basis of third order splines for x- and
     y-coordinate.
 
-    Inputs:
-    coeffs_x:   coefficient matrix of the x splines with size (no_splines x 4).
-    coeffs_y:   coefficient matrix of the y splines with size (no_splines x 4).
-    ind_spls:   contains the indices of the splines that hold the points for which we want to calculate heading/curv.
-    t_spls:     containts the relative spline coordinate values (t) of every point on the splines.
-    calc_curv:  bool flag to show if curvature should be calculated as well (kappa is set 0.0 otherwise).
+    .. inputs::
+    :param coeffs_x:    coefficient matrix of the x splines with size (no_splines x 4).
+    :type coeffs_x:     np.ndarray
+    :param coeffs_y:    coefficient matrix of the y splines with size (no_splines x 4).
+    :type coeffs_y:     np.ndarray
+    :param ind_spls:    contains the indices of the splines that hold the points for which we want to calculate heading/curv.
+    :type ind_spls:     np.ndarray
+    :param t_spls:      containts the relative spline coordinate values (t) of every point on the splines.
+    :type t_spls:       np.ndarray
+    :param calc_curv:   bool flag to show if curvature should be calculated as well (kappa is set 0.0 otherwise).
+    :type calc_curv:    bool
 
-    Outputs:
-    psi:        heading at every point.
-    kappa:      curvature at every point.
+    .. outputs::
+    :return psi:        heading at every point.
+    :rtype psi:         float
+    :return kappa:      curvature at every point.
+    :rtype kappa:       float
 
+    .. notes::
     len(ind_spls) = len(t_spls) = len(psi) = len(kappa)
     """
 

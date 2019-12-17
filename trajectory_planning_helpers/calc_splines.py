@@ -8,33 +8,44 @@ def calc_splines(path: np.ndarray,
                  psi_e: float = None,
                  use_dist_scaling: bool = True) -> tuple:
     """
-    Author:
+    author:
     Tim Stahl & Alexander Heilmeier
 
-    Description:
-    Solve for a curvature continous cubic spline between given poses
+    .. description::
+    Solve for a curvature continous cubic spline between given poses.
 
-                    P_{x,y}   = a3 *t³ + a2 *t² + a1*t + a0
-                    P_{x,y}'  = 3a3*t² + 2a2*t  + a1
-                    P_{x,y}'' = 6a3*t² + 2a2
+    P_{x,y}   = a3 *t³ + a2 *t² + a1*t + a0
+    P_{x,y}'  = 3a3*t² + 2a2*t  + a1
+    P_{x,y}'' = 6a3*t² + 2a2
 
-                    a * {x; y} = {b_x; b_y}
+    a * {x; y} = {b_x; b_y}
 
-    Inputs:
-    path:                   x and y coordinates as the basis for the spline construction (closed or unclosed).
-    el_lengths:             distances between path points (closed or unclosed).
-    psi_{s,e}:              orientation of the {start, end} point.
-    use_dist_scaling:       bool flag to indicate if heading and curvature scaling should be performed. This is required
-                            if the distances between the points in the path are not equal.
+    .. inputs::
+    :param path:                x and y coordinates as the basis for the spline construction (closed or unclosed).
+    :type path:                 np.ndarray
+    :param el_lengths:          distances between path points (closed or unclosed).
+    :type el_lengths:           np.ndarray
+    :param psi_s:               orientation of the {start, end} point.
+    :type psi_s:                float
+    :param psi_e:               orientation of the {start, end} point.
+    :type psi_e:                float
+    :param use_dist_scaling:    bool flag to indicate if heading and curvature scaling should be performed. This is required
+                                if the distances between the points in the path are not equal.
+    :type use_dist_scaling:     bool
 
+    .. outputs::
+    :return x_coeff:            spline coefficients of the x-component.
+    :rtype x_coeff:             np.ndarray
+    :return y_coeff:            spline coefficients of the y-component.
+    :rtype y_coeff:             np.ndarray
+    :return M:                  LES coefficients.
+    :rtype M:                   np.ndarray
+    :return normvec_normalized: normalized normal vectors [x, y].
+    :rtype normvec_normalized:  np.ndarray
+
+    .. notes::
     path and el_lengths inputs can either be closed or unclosed, but must be consistent! The function detects
     automatically if the path was inserted closed.
-
-    Outputs:
-    x_coeff:                spline coefficients of the x-component.
-    y_coeff:                spline coefficients of the y-component.
-    M:                      LES coefficients.
-    normvec_normalized:     normalized normal vectors.
 
     Coefficient matrices have the form a_i, b_i * t, c_i * t^2, d_i * t^3.
     """

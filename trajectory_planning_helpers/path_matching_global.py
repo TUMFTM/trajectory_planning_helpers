@@ -1,29 +1,36 @@
 import numpy as np
 import trajectory_planning_helpers.path_matching_local
 import trajectory_planning_helpers.get_rel_path_part
-import typing
+from typing import Union
 
 
 def path_matching_global(path_cl: np.ndarray,
                          ego_position: np.ndarray,
-                         s_expected: typing.Union[float, None] = None,
+                         s_expected: Union[float, None] = None,
                          s_range: float = 20.0) -> tuple:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Description:
+    .. description::
     Get the corresponding s coordinate and the displacement of the own vehicle in relation to the global path.
 
-    Inputs:
-    path_cl:        Closed path used to match ego position ([s, x, y]).
-    ego_position:   Ego position of the vehicle ([x, y]).
-    s_expected:     Expected s position of the vehicle in m.
-    s_range:        Range around expected s position of the vehicle to search for the match in m.
+    .. inputs::
+    :param path_cl:         Closed path used to match ego position ([s, x, y]).
+    :type path_cl:          np.ndarray
+    :param ego_position:    Ego position of the vehicle ([x, y]).
+    :type ego_position:     np.ndarray
+    :param s_expected:      Expected s position of the vehicle in m.
+    :type s_expected:       Union[float, None]
+    :param s_range:         Range around expected s position of the vehicle to search for the match in m.
+    :type s_range:          float
 
-    Outputs:
-    s_interp:       Interpolated s position of the vehicle in m. The following holds: s_interp in range [0.0,s_tot[.
-    d_displ:        Estimated displacement from the trajectory in m.
+    .. outputs::
+    :return s_interp:       Interpolated s position of the vehicle in m. The following holds: s_interp in range
+                            [0.0,s_tot[.
+    :rtype s_interp:        float
+    :return d_displ:        Estimated displacement from the trajectory in m.
+    :rtype d_displ:         float
     """
 
     # ------------------------------------------------------------------------------------------------------------------

@@ -6,25 +6,31 @@ def interp_track_widths(w_track: np.ndarray,
                         t_values: np.ndarray,
                         incl_last_point: bool = False) -> np.ndarray:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Description:
+    .. description::
     The function (linearly) interpolates the track widths in the same steps as the splines were interpolated before.
 
     Keep attention that the (multiple) interpolation of track widths can lead to unwanted effects, e.g. that peaks
     in the track widths can disappear if the stepsize is too large (kind of an aliasing effect).
 
-    Inputs:
-    w_track:            array containing the track widths [w_track_right, w_track_left] to interpolate (unit is meters).
-    spline_inds:        indices that show which spline (and here w_track element) shall be interpolated.
-    t_values:           relative spline coordinate values (t) of every point on the splines specified by spline_inds.
-    incl_last_point:    bool flag to show if last point should be included or not.
+    .. inputs::
+    :param w_track:         array containing the track widths [w_track_right, w_track_left] to interpolate (unit meters)
+    :type w_track:          np.ndarray
+    :param spline_inds:     indices that show which spline (and here w_track element) shall be interpolated.
+    :type spline_inds:      np.ndarray
+    :param t_values:        relative spline coordinate values (t) of every point on the splines specified by spline_inds
+    :type t_values:         np.ndarray
+    :param incl_last_point: bool flag to show if last point should be included or not.
+    :type incl_last_point:  bool
 
+    .. outputs::
+    :return w_track_interp: array with interpolated track widths.
+    :rtype w_track_interp:  np.ndarray
+
+    .. notes::
     All inputs are unclosed.
-
-    Outputs:
-    w_track_interp:     array with interpolated track widths.
     """
 
     # ------------------------------------------------------------------------------------------------------------------

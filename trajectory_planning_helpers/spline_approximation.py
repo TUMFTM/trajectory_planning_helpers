@@ -13,26 +13,35 @@ def spline_approximation(track: np.ndarray,
                          stepsize_reg: float = 3.0,
                          debug: bool = False) -> np.ndarray:
     """
-    Author:
+    author:
     Fabian Christ
 
-    Modified by:
+    modified by:
     Alexander Heilmeier
 
-    Description:
+    .. description::
     Smooth spline approximation for a track (e.g. centerline, reference line).
 
-    Inputs:
-    track:          [x, y, w_tr_right, w_tr_left] (always unclosed).
-    k_reg:          order of B splines.
-    s_reg:          smoothing factor (usually between 5 and 100).
-    stepsize_prep:  stepsize used for linear track interpolation before spline approximation.
-    stepsize_reg:   stepsize after smoothing.
+    .. inputs::
+    :param track:           [x, y, w_tr_right, w_tr_left] (always unclosed).
+    :type track:            np.ndarray
+    :param k_reg:           order of B splines.
+    :type k_reg:            int
+    :param s_reg:           smoothing factor (usually between 5 and 100).
+    :type s_reg:            int
+    :param stepsize_prep:   stepsize used for linear track interpolation before spline approximation.
+    :type stepsize_prep:    float
+    :param stepsize_reg:    stepsize after smoothing.
+    :type stepsize_reg:     float
+    :param debug:           flag for printing debug messages
+    :type debug:            bool
 
+    .. outputs::
+    :return track_reg:      [x, y, w_tr_right, w_tr_left] (always unclosed).
+    :rtype track_reg:       np.ndarray
+
+    .. notes::
     The function can only be used for closable tracks, i.e. track is closed at the beginning!
-
-    Outputs:
-    track_reg:      [x, y, w_tr_right, w_tr_left] (always unclosed).
     """
 
     # ------------------------------------------------------------------------------------------------------------------

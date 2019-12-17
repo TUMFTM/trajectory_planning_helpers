@@ -14,10 +14,10 @@ def opt_min_curv(reftrack: np.ndarray,
                  print_debug: bool = False,
                  plot_debug: bool = False) -> tuple:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Description:
+    .. description::
     This function uses a QP solver to minimize the summed curvature of a path by moving the path points along their
     normal vectors within the track width.
 
@@ -28,25 +28,34 @@ def opt_min_curv(reftrack: np.ndarray,
 
     Hint: CVXOPT can be used as a solver instead of quadprog by uncommenting the import and corresponding code section.
 
-    Inputs:
-    reftrack:       array containing the reference track, i.e. a reference line and the according track widths to the
-                        right and to the left [x, y, w_tr_right, w_tr_left] (unit is meter, must be unclosed!)
-    normvectors:    normalized normal vectors for every point of the reference track [x_component, y_component]
+    .. inputs::
+    :param reftrack:    array containing the reference track, i.e. a reference line and the according track widths to
+                        the right and to the left [x, y, w_tr_right, w_tr_left] (unit is meter, must be unclosed!)
+    :type reftrack:     np.ndarray
+    :param normvectors: normalized normal vectors for every point of the reference track [x_component, y_component]
                         (unit is meter, must be unclosed!)
-    A:              linear equation system matrix for splines (applicable for both, x and y direction)
+    :type normvectors:  np.ndarray
+    :param A:           linear equation system matrix for splines (applicable for both, x and y direction)
                         -> System matrices have the form a_i, b_i * t, c_i * t^2, d_i * t^3
                         -> see calc_splines.py for further information or to obtain this matrix
-    kappa_bound:    curvature boundary to consider during optimization.
-    w_veh:          vehicle width in m. It is considered during the calculation of the allowed deviations from the
+    :type A:            np.ndarray
+    :param kappa_bound: curvature boundary to consider during optimization.
+    :type kappa_bound:  float
+    :param w_veh:       vehicle width in m. It is considered during the calculation of the allowed deviations from the
                         reference line.
-    print_debug:    bool flag to print debug messages.
-    plot_debug:     bool flag to plot the curvatures that are calculated based on the original linearization and on a
-                        linearization around the solution.
+    :type w_veh:        float
+    :param print_debug: bool flag to print debug messages.
+    :type print_debug:  bool
+    :param plot_debug:  bool flag to plot the curvatures that are calculated based on the original linearization and on
+                        a linearization around the solution.
+    :type plot_debug:   bool
 
-    Outputs:
-    alpha_mincurv:  solution vector of the optimization problem containing the lateral shift in m for every point.
-    curv_error_max: maximum curvature error when comparing the curvature calculated on the basis of the linearization
-                        around the original refererence track and around the solution.
+    .. outputs::
+    :return alpha_mincurv:  solution vector of the opt. problem containing the lateral shift in m for every point.
+    :rtype alpha_mincurv:   np.ndarray
+    :return curv_error_max: maximum curvature error when comparing the curvature calculated on the basis of the
+                            linearization around the original refererence track and around the solution.
+    :rtype curv_error_max:  float
     """
 
     # ------------------------------------------------------------------------------------------------------------------

@@ -3,18 +3,20 @@ import numpy as np
 
 def import_ggv(ggv_import_path: str) -> np.ndarray:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Description:
+    .. description::
     This function imports our vehicle ggv diagram consisting of the columns
     [vx, ax_max_emotors, ax_max_tires, ay_max_tires]
 
-    Inputs:
-    ggv_import_path:    Path to the ggv csv file.
+    .. inputs::
+    :param ggv_import_path:     Path to the ggv csv file.
+    :type ggv_import_path:      str
 
-    Outputs:
-    ggv:                ggv diagram.
+    .. outputs::
+    :return ggv:                ggv diagram.
+    :rtype ggv:                 np.ndarray
     """
 
     # load ggv

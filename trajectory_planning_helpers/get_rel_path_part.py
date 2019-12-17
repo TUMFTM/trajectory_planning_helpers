@@ -8,28 +8,37 @@ def get_rel_path_part(path_cl: np.ndarray,
                       bound_right_cl: np.ndarray = None,
                       bound_left_cl: np.ndarray = None) -> tuple:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Description:
+    .. description::
     This function returns the relevant part of a closed path (e.g. on the racetrack) on the basis of a given s position.
     The distances s_dist_forw and s_dist_backw are used to determine how much the path should reach forward and
     backward from this position.
 
-    Inputs:
-    path_cl:            Closed path of which we want to extract the relevant part ([s, x, y]).
-    s_pos:              s position of the vehicle in m (matched to the s coordinate of path_cl).
-    s_dist_back:        Backward distance in m from current s position. Including last point before that value!
-    s_dist_forw:        Forward distance in m from current s position. Including first point after that value!
-    bound_right_cl:     Optional input: Right boundary ([x, y]) of path_cl. Every boundary point belongs to the path
-                        point on the same index, i.e. they have the same number of points.
-    bound_left_cl:      Optional input: Right boundary ([x, y]) of path_cl. Every boundary point belongs to the path
-                        point on the same index, i.e. they have the same number of points.
+    .. inputs::
+    :param path_cl:         Closed path of which we want to extract the relevant part ([s, x, y]).
+    :type path_cl:          np.ndarray
+    :param s_pos:           s position of the vehicle in m (matched to the s coordinate of path_cl).
+    :type s_pos:            float
+    :param s_dist_back:     Backward distance in m from current s position. Including last point before that value!
+    :type s_dist_back:      float
+    :param s_dist_forw:     Forward distance in m from current s position. Including first point after that value!
+    :type s_dist_forw:      float
+    :param bound_right_cl:  Optional input: Right boundary ([x, y]) of path_cl. Every boundary point belongs to the path
+                            point on the same index, i.e. they have the same number of points.
+    :type bound_right_cl:   np.ndarray
+    :param bound_left_cl:   Optional input: Right boundary ([x, y]) of path_cl. Every boundary point belongs to the path
+                            point on the same index, i.e. they have the same number of points.
+    :type bound_left_cl:    np.ndarray
 
-    Outputs:
-    path_rel:           Relevant part of the path ([s, x, y]). Attention: s coordinate does not start at 0m!
-    bound_right_rel:    Relevant part of right boundary ([x, y]). None if not inserted.
-    bound_left_rel:     Relevant part of left boundary ([x, y]). None if not inserted.
+    .. outputs::
+    :return path_rel:           Relevant part of the path ([s, x, y]). Attention: s coordinate does not start at 0m!
+    :rtype path_rel:            np.ndarray
+    :return bound_right_rel:    Relevant part of right boundary ([x, y]). None if not inserted.
+    :rtype bound_right_rel:     np.ndarray
+    :return bound_left_rel:     Relevant part of left boundary ([x, y]). None if not inserted.
+    :rtype bound_left_rel:      np.ndarray
     """
 
     # get s_tot into a variable

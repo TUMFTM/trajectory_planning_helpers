@@ -5,18 +5,21 @@ from typing import Union
 
 def normalize_psi(psi: Union[np.ndarray, float]) -> np.ndarray:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Description:
+    .. description::
     Normalize heading psi such that [-pi,pi[ holds as interval boundaries.
 
-    Inputs:
-    psi:        array containing headings psi to be normalized.
+    .. inputs::
+    :param psi:         array containing headings psi to be normalized.
+    :type psi:          Union[np.ndarray, float]
 
-    Outputs:
-    psi_out:    array with normalized headings psi.
+    .. outputs::
+    :return psi_out:    array with normalized headings psi.
+    :rtype psi_out:     np.ndarray
 
+    .. notes::
     len(psi) = len(psi_out)
     """
 

@@ -5,18 +5,21 @@ import trajectory_planning_helpers.normalize_psi
 
 def calc_normal_vectors(psi_vel: np.ndarray) -> np.ndarray:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Description:
+    .. description::
     Use heading to provide normalized (i.e. unit length) normal vectors.
 
-    Inputs:
-    psi_vel:                array containing the heading of every point (north up, range [-pi,pi[).
+    .. inputs::
+    :param psi_vel:                 array containing the heading of every point (north up, range [-pi,pi[).
+    :type psi_vel:                  np.ndarray
 
-    Outputs:
-    normvec_normalized:     unit length normal vectors for every point.
+    .. outputs::
+    :return normvec_normalized:     unit length normal vectors for every point [x, y].
+    :rtype normvec_normalized:      np.ndarray
 
+    .. notes::
     len(psi_vel) = len(normvec_normalized)
     """
 

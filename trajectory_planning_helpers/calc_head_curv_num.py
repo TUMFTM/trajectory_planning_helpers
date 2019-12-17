@@ -12,25 +12,39 @@ def calc_head_curv_num(path: np.ndarray,
                        stepsize_curv_review: float = 2.0,
                        calc_curv: bool = True) -> tuple:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Description:
+    .. description::
     Numerical calculation of heading psi and curvature kappa on the basis of a given path.
 
-    Inputs:
-    path:           array of points [x, y] (always unclosed).
-    el_lenghts:     array containing the element lengths.
-    is_closed:      close path for heading and curvature calculation.
-    stepsizes:      preview/review distances used for numerical heading/curvature calculation.
-    calc_curv:      bool flag to show if curvature should be calculated as well (kappa is set 0.0 otherwise).
+    .. inputs::
+    :param path:                    array of points [x, y] (always unclosed).
+    :type path:                     np.ndarray
+    :param el_lengths:              array containing the element lengths.
+    :type el_lengths:               np.ndarray
+    :param is_closed:               close path for heading and curvature calculation.
+    :type is_closed:                bool
+    :param stepsize_psi_preview:    preview/review distances used for numerical heading/curvature calculation.
+    :type stepsize_psi_preview:     float
+    :param stepsize_psi_review:     preview/review distances used for numerical heading/curvature calculation.
+    :type stepsize_psi_review:      float
+    :param stepsize_curv_preview:   preview/review distances used for numerical heading/curvature calculation.
+    :type stepsize_curv_preview:    float
+    :param stepsize_curv_review:    preview/review distances used for numerical heading/curvature calculation.
+    :type stepsize_curv_review:     float
+    :param calc_curv:               bool flag to show if curvature should be calculated (kappa is set 0.0 otherwise).
+    :type calc_curv:                bool
 
+    .. outputs::
+    :return psi:                    heading at every point (always unclosed).
+    :rtype psi:                     float
+    :return kappa:                  curvature at every point (always unclosed).
+    :rtype kappa:                   float
+
+    .. notes::
     path must be inserted unclosed, i.e. path[-1] != path[0], even if is_closed is set True! (el_lengths is kind
     of closed if is_closed is True of course!)
-
-    Outputs:
-    psi:            heading at every point (always unclosed).
-    kappa:          curvature at every point (always unclosed).
 
     case is_closed is True:
     len(path) = len(el_lengths) = len(psi) = len(kappa)

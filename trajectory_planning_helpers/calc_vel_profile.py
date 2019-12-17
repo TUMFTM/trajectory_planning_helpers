@@ -15,35 +15,48 @@ def calc_vel_profile(ggv: np.ndarray,
                      v_end: float = None,
                      filt_window: int = None) -> np.ndarray:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Modified by:
+    modified by:
     Tim Stahl
 
-    Description:
+    .. description::
     Calculates a velocity profile using the tire and motor limits as good as possible.
 
-    Inputs:
-    ggv:                ggv-diagram to be applied: [vx, ax_max_machines, ax_max_tires, ay_max_tires].
-                        ax_max_machines should be handed in without considering drag resistance! The last row's vx is
-                        assumed to be the maximum velocity of the car!
-    kappa:              curvature profile of given trajectory in rad/m (always unclosed).
-    el_lengths:         element lengths (distances between coordinates) of given trajectory.
-    closed:             flag to set if the velocity profile must be calculated for a closed or unclosed trajectory.
-    mu:                 friction coefficients (always unclosed).
-    v_start:            start velocity in m/s (used in unclosed case only).
-    v_end:              end velocity in m/s (used in unclosed case only).
-    filt_window:        filter window size for moving average filter (must be odd).
-    dyn_model_exp:      exponent used in the vehicle dynamics model (usual range [1.0,2.0]).
-    drag_coeff:         drag coefficient including all constants: drag_coeff = 0.5 * c_w * A_front * rho_air
-    m_veh:              vehicle mass in kg.
+    .. inputs::
+    :param ggv:             ggv-diagram to be applied: [vx, ax_max_machines, ax_max_tires, ay_max_tires].
+                            ax_max_machines should be handed in without considering drag resistance! The last row's vx
+                            is assumed to be the maximum velocity of the car!
+    :type ggv:              np.ndarray
+    :param kappa:           curvature profile of given trajectory in rad/m (always unclosed).
+    :type kappa:            np.ndarray
+    :param el_lengths:      element lengths (distances between coordinates) of given trajectory.
+    :type el_lengths:       np.ndarray
+    :param closed:          flag to set if the velocity profile must be calculated for a closed or unclosed trajectory.
+    :type closed:           bool
+    :param drag_coeff:      drag coefficient including all constants: drag_coeff = 0.5 * c_w * A_front * rho_air
+    :type drag_coeff:       float
+    :param m_veh:           vehicle mass in kg.
+    :type m_veh:            float
+    :param dyn_model_exp:   exponent used in the vehicle dynamics model (usual range [1.0,2.0]).
+    :type dyn_model_exp:    float
+    :param mu:              friction coefficients (always unclosed).
+    :type mu:               np.ndarray
+    :param v_start:         start velocity in m/s (used in unclosed case only).
+    :type v_start:          float
+    :param v_end:           end velocity in m/s (used in unclosed case only).
+    :type v_end:            float
+    :param filt_window:     filter window size for moving average filter (must be odd).
+    :type filt_window:      int
 
+    .. outputs::
+    :return vx_profile:     calculated velocity profile (always unclosed).
+    :rtype vx_profile:      np.ndarray
+
+    .. notes::
     All inputs must be inserted unclosed, i.e. kappa[-1] != kappa[0], even if closed is set True! (el_lengths is kind of
     closed if closed is True of course!)
-
-    Outputs:
-    vx_profile:         calculated velocity profile (always unclosed).
 
     case closed is True:
     len(kappa) = len(el_lengths) = len(mu) = len(vx_profile)
@@ -380,22 +393,31 @@ def calc_ax_poss(vx_start: float,
     """
     This function returns the possible longitudinal acceleration in the current step/point.
 
-    Inputs:
-    vx_start:           [m/s] velocity at current point
-    radius:             [m] radius on which the car is currently driving
-    ggv:                ggv-diagram to be applied: [vx, ax_max_machines, ax_max_tires, ay_max_tires].
-                        ax_max_machines should be handed in without considering drag resistance! The last row's vx is
-                        assumed to be the maximum velocity of the car!
-    mu:                 [-] current friction value
-    dyn_model_exp:      [-] exponent used in the vehicle dynamics model (usual range [1.0,2.0]).
-    drag_coeff:         [m2*kg/m3] drag coefficient including all constants: drag_coeff = 0.5 * c_w * A_front * rho_air
-    m_veh:              [kg] vehicle mass
-    mode:               [-] operation mode, can be 'accel_forw', 'decel_forw', 'decel_backw'
+    .. inputs::
+    :param vx_start:        [m/s] velocity at current point
+    :type vx_start:         float
+    :param radius:          [m] radius on which the car is currently driving
+    :type radius:           float
+    :param ggv:             ggv-diagram to be applied: [vx, ax_max_machines, ax_max_tires, ay_max_tires].
+                            ax_max_machines should be handed in without considering drag resistance! The last row's vx
+                            is assumed to be the maximum velocity of the car!
+    :type ggv:              np.ndarray
+    :param mu:              [-] current friction value
+    :type mu:               float
+    :param dyn_model_exp:   [-] exponent used in the vehicle dynamics model (usual range [1.0,2.0]).
+    :type dyn_model_exp:    float
+    :param drag_coeff:      [m2*kg/m3] drag coefficient incl. all constants: drag_coeff = 0.5 * c_w * A_front * rho_air
+    :type drag_coeff:       float
+    :param m_veh:           [kg] vehicle mass
+    :type m_veh:            float
+    :param mode:            [-] operation mode, can be 'accel_forw', 'decel_forw', 'decel_backw'
                             -> determines if machine limitations are considered and if ax should be considered negative
                             or positive during deceleration (for possible backwards iteration)
+    :type mode:             str
 
-    Outputs:
-    ax_final:           [m/s2] final acceleration from current point to next one
+    .. outputs::
+    :return ax_final:       [m/s2] final acceleration from current point to next one
+    :rtype ax_final:        float
     """
 
     # ------------------------------------------------------------------------------------------------------------------

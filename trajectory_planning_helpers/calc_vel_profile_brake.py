@@ -13,31 +13,43 @@ def calc_vel_profile_brake(ggv: np.ndarray,
                            mu: np.ndarray = None,
                            decel_max: float = None) -> np.ndarray:
     """
-    Author:
+    author:
     Alexander Heilmeier
 
-    Modified by:
+    modified by:
     Tim Stahl
 
-    Description:
+    .. description::
     Calculate brake (may also be emergency) velocity profile based on a local trajectory.
 
-    Inputs:
-    ggv:            ggv-diagram to be applied: [vx, ax_max_machines, ax_max_tires, ay_max_tires].
-                    ax_max_machines should be handed in without considering drag resistance! The last row's vx is
-                    assumed to be the maximum velocity of the car!
-    kappa:          curvature profile of given trajectory in rad/m.
-    el_lengths:     element lengths (distances between coordinates) of given trajectory.
-    v_start:        start velocity in m/s.
-    mu:             friction coefficients.
-    decel_max:      maximum deceleration to be applied (if set to "None", the max. based on ggv and kappa will be used).
-    dyn_model_exp:  exponent used in the vehicle dynamics model (usual range [1.0,2.0]).
-    drag_coeff:     drag coefficient including all constants: drag_coeff = 0.5 * c_w * A_front * rho_air
-    m_veh:          vehicle mass in kg.
+    .. inputs::
+    :param ggv:             ggv-diagram to be applied: [vx, ax_max_machines, ax_max_tires, ay_max_tires].
+                            ax_max_machines should be handed in without considering drag resistance! The last row's vx
+                            is assumed to be the maximum velocity of the car!
+    :type ggv:              np.ndarray
+    :param kappa:           curvature profile of given trajectory in rad/m.
+    :type kappa:            np.ndarray
+    :param el_lengths:      element lengths (distances between coordinates) of given trajectory.
+    :type el_lengths:       np.ndarray
+    :param v_start:         start velocity in m/s.
+    :type v_start:          float
+    :param drag_coeff:      drag coefficient including all constants: drag_coeff = 0.5 * c_w * A_front * rho_air
+    :type drag_coeff:       float
+    :param m_veh:           vehicle mass in kg.
+    :type m_veh:            float
+    :param dyn_model_exp:   exponent used in the vehicle dynamics model (usual range [1.0,2.0]).
+    :type dyn_model_exp:    float
+    :param mu:              friction coefficients.
+    :type mu:               np.ndarray
+    :param decel_max:       maximum deceleration to be applied (if set to "None", the max. based on ggv and kappa will
+                            be used).
+    :type decel_max:        float
 
-    Outputs:
-    vx_profile:     calculated velocity profile using maximum deceleration of the car.
+    .. outputs::
+    :return vx_profile:     calculated velocity profile using maximum deceleration of the car.
+    :rtype vx_profile:      np.ndarray
 
+    .. notes::
     len(kappa) = len(el_lengths) + 1 = len(mu) = len(vx_profile)
     """
 
