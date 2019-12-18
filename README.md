@@ -31,4 +31,8 @@ not work properly on a common street network.
 * `side_of_line`: Function determines if a point is on the left or right side of a line.
 * `spline_approximation`: Function used to obtain a smoothed track on the basis of a spline approximation.
 
+# Solutions for possible installation problems
+1) (Ubuntu) `matplotlib` requires `tkinter` -> can be solved by `sudo apt install python3-tk` 
+2) (Ubuntu) `Python.h` required for `quadprog` -> can be solved by `sudo apt install python3-dev` 
+
 Contact persons: [Alexander Heilmeier](mailto:alexander.heilmeier@tum.de), [Tim Stahl](mailto:stahl@ftm.mw.tum.de).
