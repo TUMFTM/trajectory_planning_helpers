@@ -20,7 +20,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
     install_requires=[
-        'numpy>=1.16.3',
+        'numpy>=1.16.1',
         'scipy>=1.2.1',
         'quadprog>=0.1.6',
         'matplotlib>=3.0.3'
