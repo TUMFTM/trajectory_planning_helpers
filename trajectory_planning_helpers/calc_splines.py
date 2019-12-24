@@ -12,7 +12,7 @@ def calc_splines(path: np.ndarray,
     Tim Stahl & Alexander Heilmeier
 
     .. description::
-    Solve for a curvature continous cubic spline between given poses.
+    Solve for a curvature continuous cubic spline between given poses.
 
     P_{x,y}   = a3 *t³ + a2 *t² + a1*t + a0
     P_{x,y}'  = 3a3*t² + 2a2*t  + a1
@@ -21,16 +21,19 @@ def calc_splines(path: np.ndarray,
     a * {x; y} = {b_x; b_y}
 
     .. inputs::
-    :param path:                x and y coordinates as the basis for the spline construction (closed or unclosed).
+    :param path:                x and y coordinates as the basis for the spline construction (closed or unclosed). If
+                                path is provided unclosed, headings psi_s and psi_e are required!
     :type path:                 np.ndarray
-    :param el_lengths:          distances between path points (closed or unclosed).
+    :param el_lengths:          distances between path points (closed or unclosed). The input is optional. The distances
+                                are required for the scaling of heading and curvature values. They are calculated using
+                                euclidian distances if required but not supplied.
     :type el_lengths:           np.ndarray
     :param psi_s:               orientation of the {start, end} point.
     :type psi_s:                float
     :param psi_e:               orientation of the {start, end} point.
     :type psi_e:                float
-    :param use_dist_scaling:    bool flag to indicate if heading and curvature scaling should be performed. This is required
-                                if the distances between the points in the path are not equal.
+    :param use_dist_scaling:    bool flag to indicate if heading and curvature scaling should be performed. This should
+                                be done if the distances between the points in the path are not equal.
     :type use_dist_scaling:     bool
 
     .. outputs::
@@ -44,6 +47,8 @@ def calc_splines(path: np.ndarray,
     :rtype normvec_normalized:  np.ndarray
 
     .. notes::
+    Outputs are always unclosed!
+
     path and el_lengths inputs can either be closed or unclosed, but must be consistent! The function detects
     automatically if the path was inserted closed.
 
@@ -67,7 +72,8 @@ def calc_splines(path: np.ndarray,
     if use_dist_scaling and el_lengths is None:
         el_lengths = np.sqrt(np.sum(np.power(np.diff(path, axis=0), 2), axis=1))
 
-    # if closed and use_dist_scaling active append element length in order to obtain overlapping scaling
+    # if closed and use_dist_scaling active append element length in order to obtain overlapping elements for proper
+    # scaling of the last element afterwards
     if use_dist_scaling and closed:
         el_lengths = np.hstack((el_lengths, el_lengths[0]))
 
