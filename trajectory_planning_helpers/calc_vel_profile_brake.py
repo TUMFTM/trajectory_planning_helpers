@@ -23,9 +23,7 @@ def calc_vel_profile_brake(ggv: np.ndarray,
     Calculate brake (may also be emergency) velocity profile based on a local trajectory.
 
     .. inputs::
-    :param ggv:             ggv-diagram to be applied: [vx, ax_max_machines, ax_max_tires, ay_max_tires].
-                            ax_max_machines should be handed in without considering drag resistance! The last row's vx
-                            is assumed to be the maximum velocity of the car!
+    :param ggv:             ggv-diagram to be applied: [vx, ax_max, ay_max]. Velocity in m/s, accelerations in m/s2.
     :type ggv:              np.ndarray
     :param kappa:           curvature profile of given trajectory in rad/m.
     :type kappa:            np.ndarray
@@ -73,9 +71,11 @@ def calc_vel_profile_brake(ggv: np.ndarray,
     if not 1.0 <= dyn_model_exp <= 2.0:
         print('WARNING: Exponent for the vehicle dynamics model should be in the range [1.0,2.0]!')
 
-    if ggv.shape[1] != 4:
-        raise ValueError("ggv diagram must consist of the four columns [vx, ax_max_emotors, ax_max_tires,"
-                         " ay_max_tires]!")
+    if ggv.shape[1] != 3:
+        raise ValueError("ggv diagram must consist of the three columns [vx, ax_max, ay_max]!")
+
+    if ggv[-1, 0] < v_start:
+        raise ValueError("ggv has to cover the entire velocity range of the car (i.e. >= v_start)!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # PREPARATIONS -----------------------------------------------------------------------------------------------------
@@ -102,10 +102,11 @@ def calc_vel_profile_brake(ggv: np.ndarray,
 
         # calculate longitudinal acceleration
         ggv_mod = np.copy(ggv)
-        ggv_mod[:, 2] *= -1.0  # use negative acceleration in x axis for forward deceleration
+        ggv_mod[:, 1] *= -1.0  # use negative acceleration in x axis for forward deceleration
         ax_final = trajectory_planning_helpers.calc_vel_profile.calc_ax_poss(vx_start=vx_profile[i],
                                                                              radius=radii[i],
                                                                              ggv=ggv_mod,
+                                                                             ax_max_machines=None,
                                                                              mu=mu[i],
                                                                              mode='decel_forw',
                                                                              dyn_model_exp=dyn_model_exp,
@@ -122,7 +123,7 @@ def calc_vel_profile_brake(ggv: np.ndarray,
         # consider desired maximum deceleration
         if decel_max is not None and ax_final < decel_max:
             # since this planner cannot use positive tire accelerations (this would require another interpolation of
-            # ggv[:, 2]) to overcome drag we plan with the drag acceleration if it is greater (i.e. more negative) than
+            # ggv[:, 1]) to overcome drag we plan with the drag acceleration if it is greater (i.e. more negative) than
             # the desired maximum deceleration
             if ax_drag < decel_max:
                 ax_final = ax_drag

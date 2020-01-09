@@ -4,6 +4,8 @@ import trajectory_planning_helpers.conv_filt
 
 
 def calc_vel_profile(ggv: np.ndarray,
+                     ax_max_machines: np.ndarray,
+                     v_max: float,
                      kappa: np.ndarray,
                      el_lengths: np.ndarray,
                      closed: bool,
@@ -25,10 +27,13 @@ def calc_vel_profile(ggv: np.ndarray,
     Calculates a velocity profile using the tire and motor limits as good as possible.
 
     .. inputs::
-    :param ggv:             ggv-diagram to be applied: [vx, ax_max_machines, ax_max_tires, ay_max_tires].
-                            ax_max_machines should be handed in without considering drag resistance! The last row's vx
-                            is assumed to be the maximum velocity of the car!
+    :param ggv:             ggv-diagram to be applied: [vx, ax_max, ay_max]. Velocity in m/s, accelerations in m/s2.
     :type ggv:              np.ndarray
+    :param ax_max_machines: longitudinal acceleration limits by the electrical motors: [vx, ax_max_machines]. Velocity
+                            in m/s, accelerations in m/s2. They should be handed in without considering drag resistance.
+    :type ax_max_machines:  np.ndarray
+    :param v_max:           Maximum longitudinal speed in m/s.
+    :type v_max:            float
     :param kappa:           curvature profile of given trajectory in rad/m (always unclosed).
     :type kappa:            np.ndarray
     :param el_lengths:      element lengths (distances between coordinates) of given trajectory.
@@ -89,9 +94,14 @@ def calc_vel_profile(ggv: np.ndarray,
     if not 1.0 <= dyn_model_exp <= 2.0:
         print('WARNING: Exponent for the vehicle dynamics model should be in the range [1.0,2.0]!')
 
-    if ggv.shape[1] != 4:
-        raise ValueError("ggv diagram must consist of the four columns [vx, ax_max_emotors, ax_max_tires,"
-                         " ay_max_tires]!")
+    if ggv.shape[1] != 3:
+        raise ValueError("ggv diagram must consist of the three columns [vx, ax_max, ay_max]!")
+
+    if ax_max_machines.shape[1] != 2:
+        raise ValueError("ax_max_machines must consist of the two columns [vx, ax_max_machines]!")
+
+    if ggv[-1, 0] < v_max or ax_max_machines[-1, 0] < v_max:
+        raise ValueError("ggv and ax_max_machines have to cover the entire velocity range of the car (i.e. >= v_max)!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # SPEED PROFILE CALCULATION (FB) -----------------------------------------------------------------------------------
@@ -107,6 +117,8 @@ def calc_vel_profile(ggv: np.ndarray,
     # call solver
     if not closed:
         vx_profile = __solver_fb_unclosed(ggv=ggv,
+                                          ax_max_machines=ax_max_machines,
+                                          v_max=v_max,
                                           radii=radii,
                                           el_lengths=el_lengths,
                                           mu=mu,
@@ -118,6 +130,8 @@ def calc_vel_profile(ggv: np.ndarray,
 
     else:
         vx_profile = __solver_fb_closed(ggv=ggv,
+                                        ax_max_machines=ax_max_machines,
+                                        v_max=v_max,
                                         radii=radii,
                                         el_lengths=el_lengths,
                                         mu=mu,
@@ -138,6 +152,8 @@ def calc_vel_profile(ggv: np.ndarray,
 
 
 def __solver_fb_unclosed(ggv: np.ndarray,
+                         ax_max_machines: np.ndarray,
+                         v_max: float,
                          radii: np.ndarray,
                          el_lengths: np.ndarray,
                          mu: np.ndarray,
@@ -153,15 +169,14 @@ def __solver_fb_unclosed(ggv: np.ndarray,
 
     # run through all the points and check for possible lateral acceleration
     mu_mean = np.mean(mu)
-    ay_max_global = mu_mean * np.amin(np.abs(ggv[:, 3]))    # get first lateral acceleration estimate
+    ay_max_global = mu_mean * np.amin(np.abs(ggv[:, 2]))    # get first lateral acceleration estimate
     vx_profile = np.sqrt(ay_max_global * radii)             # get first velocity profile estimate
 
-    ay_max_curr = mu * np.interp(vx_profile, ggv[:, 0], ggv[:, 3])
+    ay_max_curr = mu * np.interp(vx_profile, ggv[:, 0], ggv[:, 2])
     vx_profile = np.sqrt(np.multiply(ay_max_curr, radii))
 
     # cut vx_profile to car's top speed
-    vx_max = ggv[-1, 0]
-    vx_profile[vx_profile > vx_max] = vx_max
+    vx_profile[vx_profile > v_max] = v_max
 
     # consider v_start
     if vx_profile[0] > v_start:
@@ -169,6 +184,8 @@ def __solver_fb_unclosed(ggv: np.ndarray,
 
     # calculate acceleration profile
     vx_profile = __solver_fb_acc_profile(ggv=ggv,
+                                         ax_max_machines=ax_max_machines,
+                                         v_max=v_max,
                                          radii=radii,
                                          el_lengths=el_lengths,
                                          mu=mu,
@@ -184,6 +201,8 @@ def __solver_fb_unclosed(ggv: np.ndarray,
 
     # calculate deceleration profile
     vx_profile = __solver_fb_acc_profile(ggv=ggv,
+                                         ax_max_machines=ax_max_machines,
+                                         v_max=v_max,
                                          radii=radii,
                                          el_lengths=el_lengths,
                                          mu=mu,
@@ -197,6 +216,8 @@ def __solver_fb_unclosed(ggv: np.ndarray,
 
 
 def __solver_fb_closed(ggv: np.ndarray,
+                       ax_max_machines: np.ndarray,
+                       v_max: float,
                        radii: np.ndarray,
                        el_lengths: np.ndarray,
                        mu: np.ndarray,
@@ -212,17 +233,16 @@ def __solver_fb_closed(ggv: np.ndarray,
 
     # run through all the points and check for possible lateral acceleration
     mu_mean = np.mean(mu)
-    ay_max_global = mu_mean * np.amin(np.abs(ggv[:, 3]))    # get first lateral acceleration estimate
+    ay_max_global = mu_mean * np.amin(np.abs(ggv[:, 2]))    # get first lateral acceleration estimate
     vx_profile = np.sqrt(ay_max_global * radii)             # get first velocity estimate (radii must be positive!)
 
     # do it two times to improve accuracy (because of velocity-dependent accelerations)
     for i in range(2):
-        ay_max_curr = mu * np.interp(vx_profile, ggv[:, 0], ggv[:, 3])
+        ay_max_curr = mu * np.interp(vx_profile, ggv[:, 0], ggv[:, 2])
         vx_profile = np.sqrt(np.multiply(ay_max_curr, radii))
 
     # cut vx_profile to car's top speed
-    vx_max = ggv[-1, 0]
-    vx_profile[vx_profile > vx_max] = vx_max
+    vx_profile[vx_profile > v_max] = v_max
 
     """We need to calculate the speed profile for two laps to get the correct starting and ending velocity."""
 
@@ -234,6 +254,8 @@ def __solver_fb_closed(ggv: np.ndarray,
 
     # calculate acceleration profile
     vx_profile_double = __solver_fb_acc_profile(ggv=ggv,
+                                                ax_max_machines=ax_max_machines,
+                                                v_max=v_max,
                                                 radii=radii_double,
                                                 el_lengths=el_lengths_double,
                                                 mu=mu_double,
@@ -248,6 +270,8 @@ def __solver_fb_closed(ggv: np.ndarray,
 
     # calculate deceleration profile
     vx_profile_double = __solver_fb_acc_profile(ggv=ggv,
+                                                ax_max_machines=ax_max_machines,
+                                                v_max=v_max,
                                                 radii=radii_double,
                                                 el_lengths=el_lengths_double,
                                                 mu=mu_double,
@@ -264,6 +288,8 @@ def __solver_fb_closed(ggv: np.ndarray,
 
 
 def __solver_fb_acc_profile(ggv: np.ndarray,
+                            ax_max_machines: np.ndarray,
+                            v_max: float,
                             radii: np.ndarray,
                             el_lengths: np.ndarray,
                             mu: np.ndarray,
@@ -277,7 +303,6 @@ def __solver_fb_acc_profile(ggv: np.ndarray,
     # PREPARATIONS -----------------------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------------------------------------
 
-    vx_max = ggv[-1, 0]
     no_points = vx_profile.size
 
     # check for reversed direction
@@ -325,6 +350,7 @@ def __solver_fb_acc_profile(ggv: np.ndarray,
             ax_possible_cur = calc_ax_poss(vx_start=vx_profile[i],
                                            radius=radii_mod[i],
                                            ggv=ggv,
+                                           ax_max_machines=ax_max_machines,
                                            mu=mu_mod[i],
                                            mode=mode,
                                            dyn_model_exp=dyn_model_exp,
@@ -347,6 +373,7 @@ def __solver_fb_acc_profile(ggv: np.ndarray,
                     ax_possible_next = calc_ax_poss(vx_start=vx_possible_next,
                                                     radius=radii_mod[i + 1],
                                                     ggv=ggv,
+                                                    ax_max_machines=ax_max_machines,
                                                     mu=mu_mod[i + 1],
                                                     mode=mode,
                                                     dyn_model_exp=dyn_model_exp,
@@ -368,7 +395,7 @@ def __solver_fb_acc_profile(ggv: np.ndarray,
 
             # break current acceleration phase if next speed would be higher than the maximum vehicle velocity or if we
             # are at the next acceleration phase start index
-            if vx_possible_next > vx_max or (acc_inds_rel and i >= acc_inds_rel[0]):
+            if vx_possible_next > v_max or (acc_inds_rel and i >= acc_inds_rel[0]):
                 break
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -389,6 +416,7 @@ def calc_ax_poss(vx_start: float,
                  dyn_model_exp: float,
                  drag_coeff: float,
                  m_veh: float,
+                 ax_max_machines: np.ndarray = None,
                  mode: str = 'accel_forw') -> float:
     """
     This function returns the possible longitudinal acceleration in the current step/point.
@@ -398,9 +426,7 @@ def calc_ax_poss(vx_start: float,
     :type vx_start:         float
     :param radius:          [m] radius on which the car is currently driving
     :type radius:           float
-    :param ggv:             ggv-diagram to be applied: [vx, ax_max_machines, ax_max_tires, ay_max_tires].
-                            ax_max_machines should be handed in without considering drag resistance! The last row's vx
-                            is assumed to be the maximum velocity of the car!
+    :param ggv:             ggv-diagram to be applied: [vx, ax_max, ay_max]. Velocity in m/s, accelerations in m/s2.
     :type ggv:              np.ndarray
     :param mu:              [-] current friction value
     :type mu:               float
@@ -410,6 +436,10 @@ def calc_ax_poss(vx_start: float,
     :type drag_coeff:       float
     :param m_veh:           [kg] vehicle mass
     :type m_veh:            float
+    :param ax_max_machines: longitudinal acceleration limits by the electrical motors: [vx, ax_max_machines]. Velocity
+                            in m/s, accelerations in m/s2. They should be handed in without considering drag resistance.
+                            Can be set None if using one of the decel modes.
+    :type ax_max_machines:  np.ndarray
     :param mode:            [-] operation mode, can be 'accel_forw', 'decel_forw', 'decel_backw'
                             -> determines if machine limitations are considered and if ax should be considered negative
                             or positive during deceleration (for possible backwards iteration)
@@ -424,17 +454,20 @@ def calc_ax_poss(vx_start: float,
     # PREPARATIONS -----------------------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------------------------------------
 
-    # check input
+    # check inputs
     if mode not in ['accel_forw', 'decel_forw', 'decel_backw']:
         raise ValueError("Unknown operation mode for calc_ax_poss!")
+
+    if mode == 'accel_forw' and ax_max_machines is None:
+        raise ValueError("ax_max_machines is required if operation mode is accel_forw!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # CONSIDER TIRE POTENTIAL ------------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------------------------------------
 
     # calculate possible and used accelerations (considering tires)
-    ax_max_tires = mu * np.interp(vx_start, ggv[:, 0], ggv[:, 2])
-    ay_max_tires = mu * np.interp(vx_start, ggv[:, 0], ggv[:, 3])
+    ax_max_tires = mu * np.interp(vx_start, ggv[:, 0], ggv[:, 1])
+    ay_max_tires = mu * np.interp(vx_start, ggv[:, 0], ggv[:, 2])
     ay_used = math.pow(vx_start, 2) / radius
 
     # during forward acceleration and backward deceleration ax_max_tires must be considered positive, during forward
@@ -460,8 +493,8 @@ def calc_ax_poss(vx_start: float,
     # consider limitations imposed by electrical machines during forward acceleration
     if mode == 'accel_forw':
         # interpolate machine acceleration to be able to consider varying gear ratios, efficiencies etc.
-        ax_max_machines = np.interp(vx_start, ggv[:, 0], ggv[:, 1])
-        ax_avail_vehicle = min(ax_avail_tires, ax_max_machines)
+        ax_max_machines_tmp = np.interp(vx_start, ax_max_machines[:, 0], ax_max_machines[:, 1])
+        ax_avail_vehicle = min(ax_avail_tires, ax_max_machines_tmp)
     else:
         ax_avail_vehicle = ax_avail_tires
 
