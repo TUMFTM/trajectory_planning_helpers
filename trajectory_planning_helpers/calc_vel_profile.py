@@ -5,12 +5,12 @@ import trajectory_planning_helpers.conv_filt
 
 def calc_vel_profile(ggv: np.ndarray,
                      ax_max_machines: np.ndarray,
-                     v_max: float,
                      kappa: np.ndarray,
                      el_lengths: np.ndarray,
                      closed: bool,
                      drag_coeff: float,
                      m_veh: float,
+                     v_max: float = None,
                      dyn_model_exp: float = 1.0,
                      mu: np.ndarray = None,
                      v_start: float = None,
@@ -32,8 +32,6 @@ def calc_vel_profile(ggv: np.ndarray,
     :param ax_max_machines: longitudinal acceleration limits by the electrical motors: [vx, ax_max_machines]. Velocity
                             in m/s, accelerations in m/s2. They should be handed in without considering drag resistance.
     :type ax_max_machines:  np.ndarray
-    :param v_max:           Maximum longitudinal speed in m/s.
-    :type v_max:            float
     :param kappa:           curvature profile of given trajectory in rad/m (always unclosed).
     :type kappa:            np.ndarray
     :param el_lengths:      element lengths (distances between coordinates) of given trajectory.
@@ -44,6 +42,9 @@ def calc_vel_profile(ggv: np.ndarray,
     :type drag_coeff:       float
     :param m_veh:           vehicle mass in kg.
     :type m_veh:            float
+    :param v_max:           Maximum longitudinal speed in m/s (optional). If None we take the minimum of the fastest
+                            velocities covered by the ggv and ax_max_machines.
+    :type v_max:            float
     :param dyn_model_exp:   exponent used in the vehicle dynamics model (usual range [1.0,2.0]).
     :type dyn_model_exp:    float
     :param mu:              friction coefficients (always unclosed).
@@ -100,7 +101,10 @@ def calc_vel_profile(ggv: np.ndarray,
     if ax_max_machines.shape[1] != 2:
         raise ValueError("ax_max_machines must consist of the two columns [vx, ax_max_machines]!")
 
-    if ggv[-1, 0] < v_max or ax_max_machines[-1, 0] < v_max:
+    if v_max is None:
+        v_max = min(ggv[-1, 0], ax_max_machines[-1, 0])
+
+    elif ggv[-1, 0] < v_max or ax_max_machines[-1, 0] < v_max:
         raise ValueError("ggv and ax_max_machines have to cover the entire velocity range of the car (i.e. >= v_max)!")
 
     # ------------------------------------------------------------------------------------------------------------------
