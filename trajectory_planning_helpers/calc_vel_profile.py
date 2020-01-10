@@ -3,13 +3,14 @@ import math
 import trajectory_planning_helpers.conv_filt
 
 
-def calc_vel_profile(ggv: np.ndarray,
-                     ax_max_machines: np.ndarray,
+def calc_vel_profile(ax_max_machines: np.ndarray,
                      kappa: np.ndarray,
                      el_lengths: np.ndarray,
                      closed: bool,
                      drag_coeff: float,
                      m_veh: float,
+                     ggv: np.ndarray = None,
+                     loc_gg: np.ndarray = None,
                      v_max: float = None,
                      dyn_model_exp: float = 1.0,
                      mu: np.ndarray = None,
@@ -27,8 +28,6 @@ def calc_vel_profile(ggv: np.ndarray,
     Calculates a velocity profile using the tire and motor limits as good as possible.
 
     .. inputs::
-    :param ggv:             ggv-diagram to be applied: [vx, ax_max, ay_max]. Velocity in m/s, accelerations in m/s2.
-    :type ggv:              np.ndarray
     :param ax_max_machines: longitudinal acceleration limits by the electrical motors: [vx, ax_max_machines]. Velocity
                             in m/s, accelerations in m/s2. They should be handed in without considering drag resistance.
     :type ax_max_machines:  np.ndarray
@@ -42,8 +41,14 @@ def calc_vel_profile(ggv: np.ndarray,
     :type drag_coeff:       float
     :param m_veh:           vehicle mass in kg.
     :type m_veh:            float
-    :param v_max:           Maximum longitudinal speed in m/s (optional). If None we take the minimum of the fastest
-                            velocities covered by the ggv and ax_max_machines.
+    :param ggv:             ggv-diagram to be applied: [vx, ax_max, ay_max]. Velocity in m/s, accelerations in m/s2.
+                            ATTENTION: Insert either ggv + mu (optional) or loc_gg!
+    :type ggv:              np.ndarray
+    :param loc_gg:          local gg diagrams along the path points: [[ax_max_0, ay_max_0], [ax_max_1, ay_max_1], ...],
+                            accelerations in m/s2. ATTENTION: Insert either ggv + mu (optional) or loc_gg!
+    :type loc_gg:           np.ndarray
+    :param v_max:           Maximum longitudinal speed in m/s (optional if ggv is supplied, taking the minimum of the
+                            fastest velocities covered by the ggv and ax_max_machines arrays then).
     :type v_max:            float
     :param dyn_model_exp:   exponent used in the vehicle dynamics model (usual range [1.0,2.0]).
     :type dyn_model_exp:    float
@@ -71,16 +76,41 @@ def calc_vel_profile(ggv: np.ndarray,
     len(kappa) = len(el_lengths) + 1 = len(mu) = len(vx_profile)
     """
 
-    # check inputs
+    # ------------------------------------------------------------------------------------------------------------------
+    # INPUT CHECKS -----------------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------------------------------
+
+    # check if either ggv (and optionally mu) or loc_gg are handed in
+    if (ggv is not None or mu is not None) and loc_gg is not None:
+        raise ValueError("Either ggv and optionally mu OR loc_gg must be supplied, not both (or all) of them!")
+
+    if ggv is None and loc_gg:
+        raise ValueError("Either ggv or loc_gg must be supplied!")
+
+    # check shape of loc_gg
+    if loc_gg is not None:
+        if loc_gg.shape[0] != kappa.size:
+            raise ValueError("Length of loc_gg and kappa must be equal!")
+
+        if loc_gg.shape[1] != 2:
+            raise ValueError("loc_gg must consist of two columns: [ax_max, ay_max]!")
+
+    # check shape of ggv
+    if ggv is not None and ggv.shape[1] != 3:
+        raise ValueError("ggv diagram must consist of the three columns [vx, ax_max, ay_max]!")
+
+    # check size of mu
     if mu is not None and kappa.size != mu.size:
         raise ValueError("kappa and mu must have the same length!")
 
+    # check size of kappa and element lengths
     if closed and kappa.size != el_lengths.size:
         raise ValueError("kappa and el_lengths must have the same length if closed!")
 
     elif not closed and kappa.size != el_lengths.size + 1:
         raise ValueError("kappa must have the length of el_lengths + 1 if unclosed!")
 
+    # check start and end velocities
     if not closed and v_start is None:
         raise ValueError("v_start must be provided for the unclosed case!")
 
@@ -92,20 +122,48 @@ def calc_vel_profile(ggv: np.ndarray,
         v_end = 0.0
         print('WARNING: Input v_end was < 0.0. Using v_end = 0.0 instead!')
 
+    # check dyn_model_exp
     if not 1.0 <= dyn_model_exp <= 2.0:
-        print('WARNING: Exponent for the vehicle dynamics model should be in the range [1.0,2.0]!')
+        print('WARNING: Exponent for the vehicle dynamics model should be in the range [1.0, 2.0]!')
 
-    if ggv.shape[1] != 3:
-        raise ValueError("ggv diagram must consist of the three columns [vx, ax_max, ay_max]!")
-
+    # check shape of ax_max_machines
     if ax_max_machines.shape[1] != 2:
         raise ValueError("ax_max_machines must consist of the two columns [vx, ax_max_machines]!")
 
+    # check v_max
     if v_max is None:
-        v_max = min(ggv[-1, 0], ax_max_machines[-1, 0])
+        if ggv is None:
+            raise ValueError("v_max must be supplied if ggv is None!")
+        else:
+            v_max = min(ggv[-1, 0], ax_max_machines[-1, 0])
 
-    elif ggv[-1, 0] < v_max or ax_max_machines[-1, 0] < v_max:
-        raise ValueError("ggv and ax_max_machines have to cover the entire velocity range of the car (i.e. >= v_max)!")
+    else:
+        # check if ggv covers velocity until v_max
+        if ggv is not None and ggv[-1, 0] < v_max:
+            raise ValueError("ggv has to cover the entire velocity range of the car (i.e. >= v_max)!")
+
+        # check if ax_max_machines covers velocity until v_max
+        if ax_max_machines[-1, 0] < v_max:
+            raise ValueError("ax_max_machines has to cover the entire velocity range of the car (i.e. >= v_max)!")
+
+    # ------------------------------------------------------------------------------------------------------------------
+    # BRINGING GGV OR LOC_GG INTO SHAPE FOR EQUAL HANDLING AFTERWARDS --------------------------------------------------
+    # ------------------------------------------------------------------------------------------------------------------
+
+    """For an equal/easier handling of every case afterwards we bring all cases into a form where the local ggv is made
+    available for every waypoint, i.e. [ggv_0, ggv_1, ggv_2, ...] -> we have a three dimensional array p_ggv (path_ggv)
+    where the first dimension is the waypoint, the second is the velocity and the third is the two acceleration columns
+    -> DIM = NO_WAYPOINTS_CLOSED x NO_VELOCITY ENTRIES x 3"""
+
+    # CASE 1: ggv supplied -> copy it for every waypoint
+    if ggv is not None:
+        p_ggv = np.repeat(np.expand_dims(ggv, axis=0), kappa.size, axis=0)
+        op_mode = 'ggv'
+
+    # CASE 2: local gg diagram supplied -> add velocity dimension (artificial velocity of 10.0 m/s)
+    else:
+        p_ggv = np.expand_dims(np.column_stack((np.ones(loc_gg.shape[0]) * 10.0, loc_gg)), axis=1)
+        op_mode = 'loc_gg'
 
     # ------------------------------------------------------------------------------------------------------------------
     # SPEED PROFILE CALCULATION (FB) -----------------------------------------------------------------------------------
@@ -114,13 +172,9 @@ def calc_vel_profile(ggv: np.ndarray,
     # transform curvature kappa into corresponding radii (abs because curvature has a sign in our convention)
     radii = np.abs(np.divide(1.0, kappa, out=np.full(kappa.size, np.inf), where=kappa != 0.0))
 
-    # set mu to one in case it is not set
-    if mu is None:
-        mu = np.ones(kappa.size)
-
     # call solver
     if not closed:
-        vx_profile = __solver_fb_unclosed(ggv=ggv,
+        vx_profile = __solver_fb_unclosed(p_ggv=p_ggv,
                                           ax_max_machines=ax_max_machines,
                                           v_max=v_max,
                                           radii=radii,
@@ -130,10 +184,11 @@ def calc_vel_profile(ggv: np.ndarray,
                                           v_end=v_end,
                                           dyn_model_exp=dyn_model_exp,
                                           drag_coeff=drag_coeff,
-                                          m_veh=m_veh)
+                                          m_veh=m_veh,
+                                          op_mode=op_mode)
 
     else:
-        vx_profile = __solver_fb_closed(ggv=ggv,
+        vx_profile = __solver_fb_closed(p_ggv=p_ggv,
                                         ax_max_machines=ax_max_machines,
                                         v_max=v_max,
                                         radii=radii,
@@ -141,7 +196,8 @@ def calc_vel_profile(ggv: np.ndarray,
                                         mu=mu,
                                         dyn_model_exp=dyn_model_exp,
                                         drag_coeff=drag_coeff,
-                                        m_veh=m_veh)
+                                        m_veh=m_veh,
+                                        op_mode=op_mode)
 
     # ------------------------------------------------------------------------------------------------------------------
     # POSTPROCESSING ---------------------------------------------------------------------------------------------------
@@ -155,15 +211,16 @@ def calc_vel_profile(ggv: np.ndarray,
     return vx_profile
 
 
-def __solver_fb_unclosed(ggv: np.ndarray,
+def __solver_fb_unclosed(p_ggv: np.ndarray,
                          ax_max_machines: np.ndarray,
                          v_max: float,
                          radii: np.ndarray,
                          el_lengths: np.ndarray,
-                         mu: np.ndarray,
                          v_start: float,
                          drag_coeff: float,
                          m_veh: float,
+                         op_mode: str,
+                         mu: np.ndarray = None,
                          v_end: float = None,
                          dyn_model_exp: float = 1.0) -> np.ndarray:
 
@@ -171,13 +228,26 @@ def __solver_fb_unclosed(ggv: np.ndarray,
     # FORWARD BACKWARD SOLVER ------------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------------------------------------
 
-    # run through all the points and check for possible lateral acceleration
-    mu_mean = np.mean(mu)
-    ay_max_global = mu_mean * np.amin(np.abs(ggv[:, 2]))    # get first lateral acceleration estimate
-    vx_profile = np.sqrt(ay_max_global * radii)             # get first velocity profile estimate
+    # handle mu
+    if mu is None:
+        mu = np.ones(radii.size)
+        mu_mean = 1.0
+    else:
+        mu_mean = np.mean(mu)
 
-    ay_max_curr = mu * np.interp(vx_profile, ggv[:, 0], ggv[:, 2])
-    vx_profile = np.sqrt(np.multiply(ay_max_curr, radii))
+    # run through all the points and check for possible lateral acceleration
+    if op_mode == 'ggv':
+        # in ggv mode all ggvs are equal -> we can use the first one
+        ay_max_global = mu_mean * np.amin(p_ggv[0, :, 2])   # get first lateral acceleration estimate
+        vx_profile = np.sqrt(ay_max_global * radii)         # get first velocity profile estimate
+
+        ay_max_curr = mu * np.interp(vx_profile, p_ggv[0, :, 0], p_ggv[0, :, 2])
+        vx_profile = np.sqrt(np.multiply(ay_max_curr, radii))
+
+    else:
+        # in loc_gg mode all ggvs consist of a single line due to the missing velocity dependency, mu is None in this
+        # case
+        vx_profile = np.sqrt(p_ggv[:, 0, 2] * radii)        # get first velocity profile estimate
 
     # cut vx_profile to car's top speed
     vx_profile[vx_profile > v_max] = v_max
@@ -187,7 +257,7 @@ def __solver_fb_unclosed(ggv: np.ndarray,
         vx_profile[0] = v_start
 
     # calculate acceleration profile
-    vx_profile = __solver_fb_acc_profile(ggv=ggv,
+    vx_profile = __solver_fb_acc_profile(p_ggv=p_ggv,
                                          ax_max_machines=ax_max_machines,
                                          v_max=v_max,
                                          radii=radii,
@@ -204,7 +274,7 @@ def __solver_fb_unclosed(ggv: np.ndarray,
         vx_profile[-1] = v_end
 
     # calculate deceleration profile
-    vx_profile = __solver_fb_acc_profile(ggv=ggv,
+    vx_profile = __solver_fb_acc_profile(p_ggv=p_ggv,
                                          ax_max_machines=ax_max_machines,
                                          v_max=v_max,
                                          radii=radii,
@@ -219,14 +289,15 @@ def __solver_fb_unclosed(ggv: np.ndarray,
     return vx_profile
 
 
-def __solver_fb_closed(ggv: np.ndarray,
+def __solver_fb_closed(p_ggv: np.ndarray,
                        ax_max_machines: np.ndarray,
                        v_max: float,
                        radii: np.ndarray,
                        el_lengths: np.ndarray,
-                       mu: np.ndarray,
                        drag_coeff: float,
                        m_veh: float,
+                       op_mode: str,
+                       mu: np.ndarray = None,
                        dyn_model_exp: float = 1.0) -> np.ndarray:
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -235,15 +306,26 @@ def __solver_fb_closed(ggv: np.ndarray,
 
     no_points = radii.size
 
-    # run through all the points and check for possible lateral acceleration
-    mu_mean = np.mean(mu)
-    ay_max_global = mu_mean * np.amin(np.abs(ggv[:, 2]))    # get first lateral acceleration estimate
-    vx_profile = np.sqrt(ay_max_global * radii)             # get first velocity estimate (radii must be positive!)
+    # handle mu
+    if mu is None:
+        mu = np.ones(no_points)
+        mu_mean = 1.0
+    else:
+        mu_mean = np.mean(mu)
 
-    # do it two times to improve accuracy (because of velocity-dependent accelerations)
-    for i in range(2):
-        ay_max_curr = mu * np.interp(vx_profile, ggv[:, 0], ggv[:, 2])
+    # run through all the points and check for possible lateral acceleration
+    if op_mode == 'ggv':
+        # in ggv mode all ggvs are equal -> we can use the first one
+        ay_max_global = mu_mean * np.amin(p_ggv[0, :, 2])   # get first lateral acceleration estimate
+        vx_profile = np.sqrt(ay_max_global * radii)         # get first velocity estimate (radii must be positive!)
+
+        ay_max_curr = mu * np.interp(vx_profile, p_ggv[0, :, 0], p_ggv[0, :, 2])
         vx_profile = np.sqrt(np.multiply(ay_max_curr, radii))
+
+    else:
+        # in loc_gg mode all ggvs consist of a single line due to the missing velocity dependency, mu is None in this
+        # case
+        vx_profile = np.sqrt(p_ggv[:, 0, 2] * radii)        # get first velocity estimate (radii must be positive!)
 
     # cut vx_profile to car's top speed
     vx_profile[vx_profile > v_max] = v_max
@@ -255,9 +337,10 @@ def __solver_fb_closed(ggv: np.ndarray,
     radii_double = np.concatenate((radii, radii), axis=0)
     el_lengths_double = np.concatenate((el_lengths, el_lengths), axis=0)
     mu_double = np.concatenate((mu, mu), axis=0)
+    p_ggv_double = np.concatenate((p_ggv, p_ggv), axis=0)
 
     # calculate acceleration profile
-    vx_profile_double = __solver_fb_acc_profile(ggv=ggv,
+    vx_profile_double = __solver_fb_acc_profile(p_ggv=p_ggv_double,
                                                 ax_max_machines=ax_max_machines,
                                                 v_max=v_max,
                                                 radii=radii_double,
@@ -273,7 +356,7 @@ def __solver_fb_closed(ggv: np.ndarray,
     vx_profile_double = np.concatenate((vx_profile_double[no_points:], vx_profile_double[no_points:]), axis=0)
 
     # calculate deceleration profile
-    vx_profile_double = __solver_fb_acc_profile(ggv=ggv,
+    vx_profile_double = __solver_fb_acc_profile(p_ggv=p_ggv_double,
                                                 ax_max_machines=ax_max_machines,
                                                 v_max=v_max,
                                                 radii=radii_double,
@@ -291,7 +374,7 @@ def __solver_fb_closed(ggv: np.ndarray,
     return vx_profile
 
 
-def __solver_fb_acc_profile(ggv: np.ndarray,
+def __solver_fb_acc_profile(p_ggv: np.ndarray,
                             ax_max_machines: np.ndarray,
                             v_max: float,
                             radii: np.ndarray,
@@ -353,7 +436,7 @@ def __solver_fb_acc_profile(ggv: np.ndarray,
 
             ax_possible_cur = calc_ax_poss(vx_start=vx_profile[i],
                                            radius=radii_mod[i],
-                                           ggv=ggv,
+                                           ggv=p_ggv[i],
                                            ax_max_machines=ax_max_machines,
                                            mu=mu_mod[i],
                                            mode=mode,
@@ -376,7 +459,7 @@ def __solver_fb_acc_profile(ggv: np.ndarray,
                 for j in range(1):
                     ax_possible_next = calc_ax_poss(vx_start=vx_possible_next,
                                                     radius=radii_mod[i + 1],
-                                                    ggv=ggv,
+                                                    ggv=p_ggv[i + 1],
                                                     ax_max_machines=ax_max_machines,
                                                     mu=mu_mod[i + 1],
                                                     mode=mode,
@@ -464,6 +547,9 @@ def calc_ax_poss(vx_start: float,
 
     if mode == 'accel_forw' and ax_max_machines is None:
         raise ValueError("ax_max_machines is required if operation mode is accel_forw!")
+
+    if ggv.ndim != 2 or ggv.shape[1] != 3:
+        raise ValueError("ggv must have two dimensions and three columns [vx, ax_max, ay_max]!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # CONSIDER TIRE POTENTIAL ------------------------------------------------------------------------------------------
