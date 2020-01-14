@@ -14,9 +14,9 @@ def interp_splines(coeffs_x: np.ndarray,
     Alexander Heilmeier & Tim Stahl
 
     .. description::
-    Interpolate points on one or more splines with third order. The last point (i.e. t = 0)
-    can be included if option is set accordingly. The algorithm keeps stepsize_approx as good as possible.
-    ws_track can be inserted optionally and should contain [w_tr_right, w_tr_left].
+    Interpolate points on one or more splines with third order. The last point (i.e. t = 1.0)
+    can be included if option is set accordingly (should be prevented for a closed raceline in most cases). The
+    algorithm keeps stepsize_approx as good as possible.
 
     .. inputs::
     :param coeffs_x:        coefficient matrix of the x splines with size (no_splines x 4).
@@ -57,7 +57,7 @@ def interp_splines(coeffs_x: np.ndarray,
         raise ValueError("Coefficient matrices must have the same length!")
 
     if spline_lengths is not None and coeffs_x.shape[0] != spline_lengths.size:
-        raise ValueError("coeffs_x and spline_lengths must have the same length!")
+        raise ValueError("coeffs_x/y and spline_lengths must have the same length!")
 
     # check if coeffs_x and coeffs_y have exactly two dimensions and raise error otherwise
     if not (coeffs_x.ndim == 2 and coeffs_y.ndim == 2):
@@ -99,10 +99,8 @@ def interp_splines(coeffs_x: np.ndarray,
 
     # create arrays to save the values
     path_interp = np.zeros((no_interp_points, 2))           # raceline coords (x, y) array
-    spline_inds = np.zeros(no_interp_points, dtype=int)     # save the spline index to which a point belongs
+    spline_inds = np.zeros(no_interp_points, dtype=np.int)  # save the spline index to which a point belongs
     t_values = np.zeros(no_interp_points)                   # save t values
-
-    j = 0
 
     if stepsize_approx is not None:
 
@@ -142,18 +140,21 @@ def interp_splines(coeffs_x: np.ndarray,
         # FIXED STEP SIZE FOR EVERY SPLINE SEGMENT ---------------------------------------------------------------------
         # --------------------------------------------------------------------------------------------------------------
 
+        j = 0
+
         for i in range(len(stepnum_fixed)):
             # skip last point except for last segment
             if i < len(stepnum_fixed) - 1:
                 t_values[j:(j + stepnum_fixed[i] - 1)] = np.linspace(0, 1, stepnum_fixed[i])[:-1]
                 spline_inds[j:(j + stepnum_fixed[i] - 1)] = i
                 j += stepnum_fixed[i] - 1
+
             else:
                 t_values[j:(j + stepnum_fixed[i])] = np.linspace(0, 1, stepnum_fixed[i])
                 spline_inds[j:(j + stepnum_fixed[i])] = i
                 j += stepnum_fixed[i]
 
-        t_set = np.column_stack(([1] * len(t_values), t_values, np.power(t_values, 2), np.power(t_values, 3)))
+        t_set = np.column_stack((np.ones(no_interp_points), t_values, np.power(t_values, 2), np.power(t_values, 3)))
 
         # remove overlapping samples
         n_samples = np.array(stepnum_fixed)
@@ -167,10 +168,10 @@ def interp_splines(coeffs_x: np.ndarray,
     # ------------------------------------------------------------------------------------------------------------------
 
     if incl_last_point:
+        path_interp[-1, 0] = np.sum(coeffs_x[-1])
+        path_interp[-1, 1] = np.sum(coeffs_y[-1])
+        spline_inds[-1] = coeffs_x.shape[0] - 1
         t_values[-1] = 1.0
-
-        path_interp[-1, 0] = coeffs_x[-1, 0] + coeffs_x[-1, 1] + coeffs_x[-1, 2] + coeffs_x[-1, 3]
-        path_interp[-1, 1] = coeffs_y[-1, 0] + coeffs_y[-1, 1] + coeffs_y[-1, 2] + coeffs_y[-1, 3]
 
     else:
         path_interp = path_interp[:-1]

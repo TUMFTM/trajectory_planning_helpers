@@ -11,19 +11,19 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='trajectory-planning-helpers',
-    version='0.56',
-    url='https://www.ftm.mw.tum.de/en/main-research/vehicle-dynamics-and-control-systems/roborace-autonomous-motorsport/',
+    version='0.57',
+    url='https://github.com/TUMFTM/trajectory_planning_helpers',
     author="Alexander Heilmeier, Tim Stahl, Fabian Christ",
-    author_email="alexander.heilmeier@tum.de, stahl@ftm.mw.tum.de",
+    author_email="alexander.heilmeier@tum.de; stahl@ftm.mw.tum.de",
     description="Useful functions used for path and trajectory planning at TUM/FTM",
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
     install_requires=[
         'numpy==1.18.1',
-        'scipy==1.3.3',
+        'scipy>=1.3.3',
         'quadprog==0.1.7',
-        'matplotlib==3.0.3'
+        'matplotlib>=3.0.3'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

@@ -84,7 +84,7 @@ def calc_vel_profile(ax_max_machines: np.ndarray,
     if (ggv is not None or mu is not None) and loc_gg is not None:
         raise ValueError("Either ggv and optionally mu OR loc_gg must be supplied, not both (or all) of them!")
 
-    if ggv is None and loc_gg:
+    if ggv is None and loc_gg is None:
         raise ValueError("Either ggv or loc_gg must be supplied!")
 
     # check shape of loc_gg
