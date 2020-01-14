@@ -14,7 +14,7 @@ setuptools.setup(
     version='0.57',
     url='https://github.com/TUMFTM/trajectory_planning_helpers',
     author="Alexander Heilmeier, Tim Stahl, Fabian Christ",
-    author_email="alexander.heilmeier@tum.de; stahl@ftm.mw.tum.de",
+    author_email="alexander.heilmeier@tum.de, stahl@ftm.mw.tum.de",
     description="Useful functions used for path and trajectory planning at TUM/FTM",
     long_description=long_description,
     long_description_content_type="text/markdown",
