@@ -31,6 +31,12 @@ not work properly on a common street network.
 * `side_of_line`: Function determines if a point is on the left or right side of a line.
 * `spline_approximation`: Function used to obtain a smoothed track on the basis of a spline approximation.
 
+# Example files
+The folder `example_files` contains an exemplary track file (`berlin_2018.csv`), ggv (`ggv.csv`) and ax_ax_machines file
+(`ax_max_machines.csv`). The two latter files can be easily imported (with checks) using `import_veh_dyn_info`. The
+files are taken from our global trajectory planner repository which can be found on
+https://github.com/TUMFTM/global_racetrajectory_optimization.
+
 # Solutions for possible installation problems
 1) (Ubuntu) `matplotlib` requires `tkinter` -> can be solved by `sudo apt install python3-tk` 
 2) (Ubuntu) `Python.h` required for `quadprog` -> can be solved by `sudo apt install python3-dev` 
