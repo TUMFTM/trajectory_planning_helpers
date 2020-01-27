@@ -89,6 +89,9 @@ def calc_vel_profile(ax_max_machines: np.ndarray,
 
     # check shape of loc_gg
     if loc_gg is not None:
+        if loc_gg.ndim != 2:
+            raise ValueError("loc_gg must have two dimensions!")
+
         if loc_gg.shape[0] != kappa.size:
             raise ValueError("Length of loc_gg and kappa must be equal!")
 

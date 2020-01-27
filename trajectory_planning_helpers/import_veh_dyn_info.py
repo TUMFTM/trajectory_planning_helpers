@@ -1,8 +1,8 @@
 import numpy as np
 
 
-def import_veh_dyn_info(ggv_import_path: str,
-                        ax_max_machines_import_path: str) -> tuple:
+def import_veh_dyn_info(ggv_import_path: str = None,
+                        ax_max_machines_import_path: str = None) -> tuple:
     """
     author:
     Alexander Heilmeier
@@ -26,44 +26,58 @@ def import_veh_dyn_info(ggv_import_path: str,
     :rtype ax_max_machines:             np.ndarray
     """
 
-    # load ggv csv
-    with open(ggv_import_path, "rb") as fh:
-        ggv = np.loadtxt(fh, delimiter=",")
+    # GGV --------------------------------------------------------------------------------------------------------------
+    if ggv_import_path is not None:
 
-    # load ax_max_machines csv
-    with open(ax_max_machines_import_path, "rb") as fh:
-        ax_max_machines = np.loadtxt(fh, delimiter=",")
+        # load csv
+        with open(ggv_import_path, "rb") as fh:
+            ggv = np.loadtxt(fh, delimiter=",")
 
-    # expand dimension of ggv and ax_max_machines in case of a single row
-    if ggv.ndim == 1:
-        ggv = np.expand_dims(ggv, 0)
+        # expand dimension in case of a single row
+        if ggv.ndim == 1:
+            ggv = np.expand_dims(ggv, 0)
 
-    if ax_max_machines.ndim == 1:
-        ax_max_machines = np.expand_dims(ax_max_machines, 0)
+        # check columns
+        if ggv.shape[1] != 3:
+            raise ValueError("ggv diagram must consist of the three columns [vx, ax_max, ay_max]!")
 
-    # check dimensions of ggv diagram and ax_max_machines
-    if ggv.shape[1] != 3:
-        raise ValueError("ggv diagram must consist of the three columns [vx, ax_max, ay_max]!")
+        # check values
+        invalid_1 = ggv[:, 0] < 0.0     # assure velocities > 0.0
+        invalid_2 = ggv[:, 1:] > 20.0   # assure valid maximum accelerations
+        invalid_3 = ggv[:, 1] < 0.0     # assure positive accelerations
+        invalid_4 = ggv[:, 2] < 0.0     # assure positive accelerations
 
-    if ax_max_machines.shape[1] != 2:
-        raise ValueError("ax_max_machines must consist of the two columns [vx, ax_max_machines]!")
+        if np.any(invalid_1) or np.any(invalid_2) or np.any(invalid_3) or np.any(invalid_4):
+            raise ValueError("ggv seems unreasonable!")
 
-    # check ggv values
-    invalid_1 = ggv[:, 0] < 0.0        # assure velocities > 0.0
-    invalid_2 = ggv[:, 1:] > 20.0      # assure valid maximum accelerations
-    invalid_3 = ggv[:, 1] < 0.0        # assure positive accelerations
-    invalid_4 = ggv[:, 2] < 0.0        # assure positive accelerations
+    else:
+        ggv = None
 
-    if np.any(invalid_1) or np.any(invalid_2) or np.any(invalid_3) or np.any(invalid_4):
-        raise ValueError("ggv diagram seems unreasonable!")
+    # AX_MAX_MACHINES --------------------------------------------------------------------------------------------------
+    if ax_max_machines_import_path is not None:
 
-    # check ax_max_machines values
-    invalid_1 = ax_max_machines[:, 0] < 0.0     # assure velocities > 0.0
-    invalid_2 = ax_max_machines[:, 1] > 20.0    # assure valid maximum accelerations
-    invalid_3 = ax_max_machines[:, 1] < 0.0     # assure positive accelerations
+        # load csv
+        with open(ax_max_machines_import_path, "rb") as fh:
+            ax_max_machines = np.loadtxt(fh, delimiter=",")
 
-    if np.any(invalid_1) or np.any(invalid_2) or np.any(invalid_3):
-        raise ValueError("ax_max_machines seems unreasonable!")
+        # expand dimension in case of a single row
+        if ax_max_machines.ndim == 1:
+            ax_max_machines = np.expand_dims(ax_max_machines, 0)
+
+        # check columns
+        if ax_max_machines.shape[1] != 2:
+            raise ValueError("ax_max_machines must consist of the two columns [vx, ax_max_machines]!")
+
+        # check values
+        invalid_1 = ax_max_machines[:, 0] < 0.0     # assure velocities > 0.0
+        invalid_2 = ax_max_machines[:, 1] > 20.0    # assure valid maximum accelerations
+        invalid_3 = ax_max_machines[:, 1] < 0.0     # assure positive accelerations
+
+        if np.any(invalid_1) or np.any(invalid_2) or np.any(invalid_3):
+            raise ValueError("ax_max_machines seems unreasonable!")
+
+    else:
+        ax_max_machines = None
 
     return ggv, ax_max_machines
 
