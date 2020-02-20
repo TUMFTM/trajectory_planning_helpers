@@ -23,3 +23,4 @@ import trajectory_planning_helpers.iqp_handler
 import trajectory_planning_helpers.opt_min_curv
 import trajectory_planning_helpers.opt_shortest_path
 import trajectory_planning_helpers.interp_track_widths
+import trajectory_planning_helpers.check_normals_crossing

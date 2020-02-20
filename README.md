@@ -15,6 +15,7 @@ not work properly on a common street network.
 * `calc_t_profile`: Calculate the temporal duration profile for a given velocity profile.
 * `calc_vel_profile`: Calculate velocity profile on the basis of a forward/backward solver.
 * `calc_vel_profile_brake`: Calculate velocity profile on the basis of a pure forward solver.
+* `check_normals_crossing`: Check if normal vectors of a given track have at least one crossing.
 * `conv_filt`: Filter a given signal using a 1D convolution (moving average) filter.
 * `create_raceline`: Function to create a raceline on the basis of the reference line and an optimization result.
 * `get_rel_path_part`: Get relevant part of a given path on the basis of a s position and a specified range.
