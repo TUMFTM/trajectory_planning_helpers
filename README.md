@@ -9,10 +9,12 @@ not work properly on a common street network.
 * `calc_ax_profile`: Calculate the longitudinal acceleration profile for a given velocity profile.
 * `calc_head_curv_an`: Analytical curvature calculation on the basis of third order splines.
 * `calc_head_curv_num`: Numerical curvature calculation.
-* `calc_normal_vectors`: Calculate normalized normal vectors on the basis of headings psi.
+* `calc_normal_vectors`: Calculate normalized normal vectors on the basis of headings psi (psi - pi/2).
+* `calc_normal_vectors_ahead`: Calculate normalized normal vectors on the basis of headings psi (psi + pi/2).
 * `calc_spline_lengths`: Calculate spline lengths.
 * `calc_splines`: Calculate splines for a (closable) path.
 * `calc_t_profile`: Calculate the temporal duration profile for a given velocity profile.
+* `calc_tangent_vectors`: Calculate normalized tangent vectors on the basis of headings psi.
 * `calc_vel_profile`: Calculate velocity profile on the basis of a forward/backward solver.
 * `calc_vel_profile_brake`: Calculate velocity profile on the basis of a pure forward solver.
 * `check_normals_crossing`: Check if normal vectors of a given track have at least one crossing.

@@ -173,7 +173,7 @@ def calc_splines(path: np.ndarray,
     coeffs_x = np.reshape(x_les, (no_splines, 4))
     coeffs_y = np.reshape(y_les, (no_splines, 4))
 
-    # get normal vector (second coefficient of cubic splines is relevant for the gradient)
+    # get normal vector (second coefficient of cubic splines is relevant for the gradient) -> heading is (psi - pi/2)
     normvec = np.stack((coeffs_y[:, 1], -coeffs_x[:, 1]), axis=1)
 
     # normalize normal vectors
