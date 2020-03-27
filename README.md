@@ -21,7 +21,8 @@ not work properly on a common street network.
 * `conv_filt`: Filter a given signal using a 1D convolution (moving average) filter.
 * `create_raceline`: Function to create a raceline on the basis of the reference line and an optimization result.
 * `get_rel_path_part`: Get relevant part of a given path on the basis of a s position and a specified range.
-* `import_veh_dyn_info`: Import the required vehicle dynamics information from several files: ggv and ax_max_machines.
+* `import_veh_dyn_info`: Imports the required vehicle dynamics information from several files: ggv and ax_max_machines.
+* `import_veh_dyn_info_2`: Imports local gg diagrams, required for local friction consideration.
 * `interp_splines`: Interpolate splines to get points with a desired stepsize.
 * `interp_track_widths`: Interpolation function for track widths.
 * `iqp_handler`: Handler function to iteratively call the minimum curvature optimization.
