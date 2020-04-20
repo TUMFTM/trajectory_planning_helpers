@@ -39,14 +39,14 @@ def nonreg_sampling(track: np.ndarray,
     coeffs_x, coeffs_y = tph.calc_splines.calc_splines(path=path_cl)[:2]
     kappa_path = tph.calc_head_curv_an.calc_head_curv_an(coeffs_x=coeffs_x,
                                                          coeffs_y=coeffs_y,
-                                                         ind_spls=np.arange(0, coeffs_x.size),
-                                                         t_spls=np.zeros(coeffs_x.size))[1]
+                                                         ind_spls=np.arange(0, coeffs_x.shape[0]),
+                                                         t_spls=np.zeros(coeffs_x.shape[0]))[1]
 
     # run through the profile to determine the indices of the points that are kept
     idx_latest = step_non_reg + 1
     sample_idxs = [0]
 
-    for idx in range(len(kappa_path)):
+    for idx in range(1, len(kappa_path)):
         if np.abs(kappa_path[idx]) >= eps_kappa or idx >= idx_latest:
             # keep this point
             sample_idxs.append(idx)
