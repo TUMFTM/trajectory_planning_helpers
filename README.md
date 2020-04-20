@@ -26,6 +26,7 @@ not work properly on a common street network.
 * `interp_splines`: Interpolate splines to get points with a desired stepsize.
 * `interp_track_widths`: Interpolation function for track widths.
 * `iqp_handler`: Handler function to iteratively call the minimum curvature optimization.
+* `nonreg_sampling`: Function to sample in non-regular intervals (based on curvature) from a given track.
 * `normalize_psi`: Normalize heading psi such that the interval [-pi, pi[ holds.
 * `opt_min_curv`: Minimum curvature optimization.
 * `opt_shortest_path`: Shortest path optimization.
