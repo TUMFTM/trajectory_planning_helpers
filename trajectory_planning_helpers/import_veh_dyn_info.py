@@ -31,7 +31,7 @@ def import_veh_dyn_info(ggv_import_path: str = None,
 
         # load csv
         with open(ggv_import_path, "rb") as fh:
-            ggv = np.loadtxt(fh, delimiter=",")
+            ggv = np.loadtxt(fh, comments='#', delimiter=",")
 
         # expand dimension in case of a single row
         if ggv.ndim == 1:
@@ -58,7 +58,7 @@ def import_veh_dyn_info(ggv_import_path: str = None,
 
         # load csv
         with open(ax_max_machines_import_path, "rb") as fh:
-            ax_max_machines = np.loadtxt(fh, delimiter=",")
+            ax_max_machines = np.loadtxt(fh, comments='#',  delimiter=",")
 
         # expand dimension in case of a single row
         if ax_max_machines.ndim == 1:
