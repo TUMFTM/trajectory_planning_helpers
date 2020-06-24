@@ -42,8 +42,13 @@ The folder `example_files` contains an exemplary track file (`berlin_2018.csv`),
 files are taken from our global trajectory planner repository which can be found on
 https://github.com/TUMFTM/global_racetrajectory_optimization.
 
-# Solutions for possible installation problems
-1) (Ubuntu) `matplotlib` requires `tkinter` -> can be solved by `sudo apt install python3-tk` 
-2) (Ubuntu) `Python.h` required for `quadprog` -> can be solved by `sudo apt install python3-dev` 
+### Solutions for possible installation problems (Windows)
+`cvxpy`, `cython` or any other package requires a `Visual C++ compiler` -> Download the build tools for Visual Studio
+2019 (https://visualstudio.microsoft.com/de/downloads/ -> tools for Visual Studio 2019 -> build tools), install them and
+chose the `C++ build tools` option to install the required C++ compiler and its dependencies
+
+### Solutions for possible installation problems (Ubuntu)
+1. `matplotlib` requires `tkinter` -> can be solved by `sudo apt install python3-tk`
+2. `Python.h` required `quadprog` -> can be solved by `sudo apt install python3-dev`
 
 Contact persons: [Alexander Heilmeier](mailto:alexander.heilmeier@tum.de), [Tim Stahl](mailto:stahl@ftm.mw.tum.de).
