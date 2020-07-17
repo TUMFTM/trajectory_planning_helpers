@@ -12,11 +12,13 @@ def calc_splines(path: np.ndarray,
     Tim Stahl & Alexander Heilmeier
 
     .. description::
-    Solve for a curvature continuous cubic spline between given poses.
+    Solve for curvature continuous cubic splines (spline parameter t) between given points i (splines evaluated at
+    t = 0 and t = 1). The splines must be set up separately for x- and y-coordinate.
 
-    P_{x,y}   = a3 *t³ + a2 *t² + a1*t + a0
-    P_{x,y}'  = 3a3*t² + 2a2*t  + a1
-    P_{x,y}'' = 6a3*t² + 2a2
+    Spline equations:
+    P_{x,y}(t)   =  a_3 * t³ +  a_2 * t² + a_1 * t + a_0
+    P_{x,y}'(t)  = 3a_3 * t² + 2a_2 * t  + a_1
+    P_{x,y}''(t) = 6a_3 * t  + 2a_2
 
     a * {x; y} = {b_x; b_y}
 
@@ -52,7 +54,7 @@ def calc_splines(path: np.ndarray,
     path and el_lengths inputs can either be closed or unclosed, but must be consistent! The function detects
     automatically if the path was inserted closed.
 
-    Coefficient matrices have the form a_i, b_i * t, c_i * t^2, d_i * t^3.
+    Coefficient matrices have the form a_0i, a_1i * t, a_2i * t^2, a_3i * t^3.
     """
 
     # check if path is closed
@@ -75,7 +77,7 @@ def calc_splines(path: np.ndarray,
     # if closed and use_dist_scaling active append element length in order to obtain overlapping elements for proper
     # scaling of the last element afterwards
     if use_dist_scaling and closed:
-        el_lengths = np.hstack((el_lengths, el_lengths[0]))
+        el_lengths = np.append((el_lengths, el_lengths[0]))
 
     # get number of splines
     no_splines = path.shape[0] - 1
@@ -97,7 +99,12 @@ def calc_splines(path: np.ndarray,
     b_y = np.zeros((no_splines * 4, 1))
 
     # create template for M array entries
-    template_M = np.array(                          # current time step           | next time step          | bounds
+    # row 1: beginning of current spline should be placed on current point (t = 0)
+    # row 2: end of current spline should be placed on next point (t = 1)
+    # row 3: heading at end of current spline should be equal to heading at beginning of next spline (t = 1 and t = 0)
+    # row 4: curvature at end of current spline should be equal to curvature at beginning of next spline (t = 1 and
+    #        t = 0)
+    template_M = np.array(                          # current point               | next point              | bounds
                 [[1,  0,  0,  0,  0,  0,  0,  0],   # a_0i                                                  = {x,y}_i
                  [1,  1,  1,  1,  0,  0,  0,  0],   # a_0i + a_1i +  a_2i +  a_3i                           = {x,y}_i+1
                  [0,  1,  2,  3,  0, -1,  0,  0],   # _      a_1i + 2a_2i + 3a_3i      - a_1i+1             = 0
@@ -113,25 +120,26 @@ def calc_splines(path: np.ndarray,
             M[j + 3, j + 6] *= math.pow(scaling[i], 2)
 
         else:
-            M[j: j + 2, j: j + 4] = [[1,  0,  0,  0],  # no curvature and heading bounds on last element
+            # no curvature and heading bounds on last element (handled afterwards)
+            M[j: j + 2, j: j + 4] = [[1,  0,  0,  0],
                                      [1,  1,  1,  1]]
 
-        b_x[j: j + 2] = [[path[i,     0]],      # NOTE: the bounds of the two last equations remain zero
+        b_x[j: j + 2] = [[path[i,     0]],
                          [path[i + 1, 0]]]
         b_y[j: j + 2] = [[path[i,     1]],
                          [path[i + 1, 1]]]
 
     # ------------------------------------------------------------------------------------------------------------------
-    # SET BOUNDARY CONDITIONS FOR FIRST AND LAST POINT -----------------------------------------------------------------
+    # SET BOUNDARY CONDITIONS FOR LAST AND FIRST POINT -----------------------------------------------------------------
     # ------------------------------------------------------------------------------------------------------------------
 
     if not closed:
-        # We want to fix heading at the start and end point (heading and curvature at start gets unbound at spline end)
-        # heading and curvature boundary condition
-        M[-2, 1] = 1                  # heading start
-        M[-1, -4:] = [0,  1,  2,  3]  # heading end
+        # if the path is unclosed we want to fix heading at the start and end point of the path (curvature cannot be
+        # determined in this case) -> set heading boundary conditions
 
-        # heading start
+        # heading start point
+        M[-2, 1] = 1  # heading start point (evaluated at t = 0)
+
         if el_lengths is None:
             el_length_s = 1.0
         else:
@@ -140,7 +148,9 @@ def calc_splines(path: np.ndarray,
         b_x[-2] = math.cos(psi_s + math.pi / 2) * el_length_s
         b_y[-2] = math.sin(psi_s + math.pi / 2) * el_length_s
 
-        # heading end
+        # heading end point
+        M[-1, -4:] = [0, 1, 2, 3]  # heading end point (evaluated at t = 1)
+
         if el_lengths is None:
             el_length_e = 1.0
         else:
@@ -150,13 +160,13 @@ def calc_splines(path: np.ndarray,
         b_y[-1] = math.sin(psi_e + math.pi / 2) * el_length_e
 
     else:
-        # gradient boundary conditions (for a closed spline)
+        # heading boundary condition (for a closed spline)
         M[-2, 1] = scaling[-1]
         M[-2, -3:] = [-1, -2, -3]
         # b_x[-2] = 0
         # b_y[-2] = 0
 
-        # curvature boundary conditions (for a closed spline)
+        # curvature boundary condition (for a closed spline)
         M[-1, 2] = 2 * math.pow(scaling[-1], 2)
         M[-1, -2:] = [-2, -6]
         # b_x[-1] = 0
@@ -173,13 +183,13 @@ def calc_splines(path: np.ndarray,
     coeffs_x = np.reshape(x_les, (no_splines, 4))
     coeffs_y = np.reshape(y_les, (no_splines, 4))
 
-    # get normal vector (second coefficient of cubic splines is relevant for the gradient) -> heading is (psi - pi/2)
+    # get normal vector (behind used here instead of ahead for consistency with other functions) (second coefficient of
+    # cubic splines is relevant for the heading)
     normvec = np.stack((coeffs_y[:, 1], -coeffs_x[:, 1]), axis=1)
 
     # normalize normal vectors
     norm_factors = 1.0 / np.sqrt(np.sum(np.power(normvec, 2), axis=1))
-    norm_factors = np.expand_dims(norm_factors, axis=1)  # second dimension must be inserted for next step
-    normvec_normalized = norm_factors * normvec
+    normvec_normalized = np.expand_dims(norm_factors, axis=1) * normvec
 
     return coeffs_x, coeffs_y, M, normvec_normalized
 
