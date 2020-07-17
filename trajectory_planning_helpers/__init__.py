@@ -28,3 +28,4 @@ import trajectory_planning_helpers.calc_tangent_vectors
 import trajectory_planning_helpers.calc_normal_vectors_ahead
 import trajectory_planning_helpers.import_veh_dyn_info_2
 import trajectory_planning_helpers.nonreg_sampling
+import trajectory_planning_helpers.interp_track

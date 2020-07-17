@@ -24,6 +24,7 @@ not work properly on a common street network.
 * `import_veh_dyn_info`: Imports the required vehicle dynamics information from several files: ggv and ax_max_machines.
 * `import_veh_dyn_info_2`: Imports local gg diagrams, required for local friction consideration.
 * `interp_splines`: Interpolate splines to get points with a desired stepsize.
+* `interp_track`: Interpolate track to get points with a desired stepsize.
 * `interp_track_widths`: Interpolation function for track widths.
 * `iqp_handler`: Handler function to iteratively call the minimum curvature optimization.
 * `nonreg_sampling`: Function to sample in non-regular intervals (based on curvature) from a given track.

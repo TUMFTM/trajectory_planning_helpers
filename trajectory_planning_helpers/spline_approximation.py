@@ -3,7 +3,7 @@ from scipy import optimize
 from scipy import spatial
 import numpy as np
 import math
-import trajectory_planning_helpers.side_of_line
+import trajectory_planning_helpers as tph
 
 
 def spline_approximation(track: np.ndarray,
@@ -48,31 +48,20 @@ def spline_approximation(track: np.ndarray,
     # LINEAR INTERPOLATION BEFORE SMOOTHING ----------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------------------------------------
 
-    # create closed track
-    track_cl = np.vstack((track, track[0]))
-    no_points_track_cl = track_cl.shape[0]
-
-    # calculate element lengths (euclidian distance)
-    el_lengths_cl = np.sqrt(np.sum(np.power(np.diff(track_cl[:, :2], axis=0), 2), axis=1))
-
-    # sum up total distance (from start) to every element
-    dists_cum_cl = np.cumsum(el_lengths_cl)
-    dists_cum_cl = np.insert(dists_cum_cl, 0, 0.0)
-
-    # calculate desired lenghts depending on specified stepsize (+1 because last element is included)
-    no_points_interp_cl = math.ceil(dists_cum_cl[-1] / stepsize_prep) + 1
-    dists_interp_cl = np.linspace(0.0, dists_cum_cl[-1], no_points_interp_cl)
-
-    # interpolate closed track points
-    track_interp_cl = np.zeros((no_points_interp_cl, 4))
-    track_interp_cl[:, 0] = np.interp(dists_interp_cl, dists_cum_cl, track_cl[:, 0])
-    track_interp_cl[:, 1] = np.interp(dists_interp_cl, dists_cum_cl, track_cl[:, 1])
-    track_interp_cl[:, 2] = np.interp(dists_interp_cl, dists_cum_cl, track_cl[:, 2])
-    track_interp_cl[:, 3] = np.interp(dists_interp_cl, dists_cum_cl, track_cl[:, 3])
+    track_interp = tph.interp_track.interp_track(track=track,
+                                                 stepsize=stepsize_prep)
+    track_interp_cl = np.vstack((track_interp, track_interp[0]))
 
     # ------------------------------------------------------------------------------------------------------------------
     # SPLINE APPROXIMATION / PATH SMOOTHING ----------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------------------------------------
+
+    # create closed track (original track)
+    track_cl = np.vstack((track, track[0]))
+    no_points_track_cl = track_cl.shape[0]
+    el_lengths_cl = np.sqrt(np.sum(np.power(np.diff(track_cl[:, :2], axis=0), 2), axis=1))
+    dists_cum_cl = np.cumsum(el_lengths_cl)
+    dists_cum_cl = np.insert(dists_cum_cl, 0, 0.0)
 
     # find B spline representation of the inserted path and smooth it in this process
     # (tck_cl: tuple (vector of knots, the B-spline coefficients, and the degree of the spline))
@@ -122,9 +111,9 @@ def spline_approximation(track: np.ndarray,
     sides = np.zeros(no_points_track_cl - 1)
 
     for i in range(no_points_track_cl - 1):
-        sides[i] = trajectory_planning_helpers.side_of_line.side_of_line(a=track_cl[i, :2],
-                                                                         b=track_cl[i+1, :2],
-                                                                         z=closest_point_cl[i])
+        sides[i] = tph.side_of_line.side_of_line(a=track_cl[i, :2],
+                                                 b=track_cl[i+1, :2],
+                                                 z=closest_point_cl[i])
 
     sides_cl = np.hstack((sides, sides[0]))
 
