@@ -11,7 +11,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='trajectory-planning-helpers',
-    version='0.70',
+    version='0.71',
     url='https://github.com/TUMFTM/trajectory_planning_helpers',
     author="Alexander Heilmeier, Tim Stahl, Fabian Christ",
     author_email="alexander.heilmeier@tum.de, stahl@ftm.mw.tum.de",
@@ -23,7 +23,7 @@ setuptools.setup(
         'numpy>=1.18.1',
         'scipy>=1.3.3',
         'quadprog==0.1.7',
-        'matplotlib>=3.0.3'
+        'matplotlib>=3.3.1'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
