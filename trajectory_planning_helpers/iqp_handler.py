@@ -128,7 +128,7 @@ def iqp_handler(reftrack: np.ndarray,
         reftrack_tmp[:, 2] -= alpha_mincurv_tmp
         reftrack_tmp[:, 3] += alpha_mincurv_tmp
 
-        ws_track_tmp = tph.interp_track_widths.interp_track_widths(w_track=reftrack_tmp[:, 2:4],
+        ws_track_tmp = tph.interp_track_widths.interp_track_widths(w_track=reftrack_tmp[:, 2:],
                                                                    spline_inds=spline_inds_tmp,
                                                                    t_values=t_values_tmp,
                                                                    incl_last_point=False)

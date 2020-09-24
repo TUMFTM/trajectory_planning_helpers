@@ -12,17 +12,18 @@ def interp_track(track: np.ndarray,
     Interpolate track points linearly to a new stepsize.
 
     .. inputs::
-    :param track:           track of the form [x, y, w_tr_right, w_tr_left].
+    :param track:           track in the format [x, y, w_tr_right, w_tr_left, (banking)].
     :type track:            np.ndarray
     :param stepsize:        desired stepsize after interpolation in m.
     :type stepsize:         float
 
     .. outputs::
-    :return track_interp:   interpolated track [x, y, w_tr_right, w_tr_left].
+    :return track_interp:   interpolated track [x, y, w_tr_right, w_tr_left, (banking)].
     :rtype track_interp:    np.ndarray
 
     .. notes::
-    track input and output are unclosed! track input must however be closable in the current form!
+    Track input and output are unclosed! track input must however be closable in the current form!
+    The banking angle is optional and must not be provided!
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -44,11 +45,20 @@ def interp_track(track: np.ndarray,
     dists_interp_cl = np.linspace(0.0, dists_cum_cl[-1], no_points_interp_cl)
 
     # interpolate closed track points
-    track_interp_cl = np.zeros((no_points_interp_cl, 4))
+    if track_cl.shape[1] == 4:
+        track_interp_cl = np.zeros((no_points_interp_cl, 4))
+    elif track_cl.shape[1] == 5:
+        track_interp_cl = np.zeros((no_points_interp_cl, 4))
+    else:
+        raise ValueError("Unknown track format!")
+
     track_interp_cl[:, 0] = np.interp(dists_interp_cl, dists_cum_cl, track_cl[:, 0])
     track_interp_cl[:, 1] = np.interp(dists_interp_cl, dists_cum_cl, track_cl[:, 1])
     track_interp_cl[:, 2] = np.interp(dists_interp_cl, dists_cum_cl, track_cl[:, 2])
     track_interp_cl[:, 3] = np.interp(dists_interp_cl, dists_cum_cl, track_cl[:, 3])
+
+    if track_cl.shape[1] == 5:
+        track_interp_cl[:, 4] = np.interp(dists_interp_cl, dists_cum_cl, track_cl[:, 4])
 
     return track_interp_cl[:-1]
 

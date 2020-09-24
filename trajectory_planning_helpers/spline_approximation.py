@@ -23,7 +23,7 @@ def spline_approximation(track: np.ndarray,
     Smooth spline approximation for a track (e.g. centerline, reference line).
 
     .. inputs::
-    :param track:           [x, y, w_tr_right, w_tr_left] (always unclosed).
+    :param track:           [x, y, w_tr_right, w_tr_left, (banking)] (always unclosed).
     :type track:            np.ndarray
     :param k_reg:           order of B splines.
     :type k_reg:            int
@@ -37,11 +37,12 @@ def spline_approximation(track: np.ndarray,
     :type debug:            bool
 
     .. outputs::
-    :return track_reg:      [x, y, w_tr_right, w_tr_left] (always unclosed).
+    :return track_reg:      [x, y, w_tr_right, w_tr_left, (banking)] (always unclosed).
     :rtype track_reg:       np.ndarray
 
     .. notes::
     The function can only be used for closable tracks, i.e. track is closed at the beginning!
+    The banking angle is optional and must not be provided!
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -80,7 +81,7 @@ def spline_approximation(track: np.ndarray,
     path_smoothed = np.array(interpolate.splev(np.linspace(0.0, 1.0, no_points_reg_cl), tck_cl)).T[:-1]
 
     # ------------------------------------------------------------------------------------------------------------------
-    # PROCESS TRACK WIDTHS ---------------------------------------------------------------------------------------------
+    # PROCESS TRACK WIDTHS (AND BANKING ANGLE IF GIVEN) ----------------------------------------------------------------
     # ------------------------------------------------------------------------------------------------------------------
 
     # find the closest points on the B spline to input points
@@ -126,6 +127,11 @@ def spline_approximation(track: np.ndarray,
     w_tr_left_smoothed_cl = np.interp(np.linspace(0.0, 1.0, no_points_reg_cl), closest_t_glob_cl, w_tr_left_new_cl)
 
     track_reg = np.column_stack((path_smoothed, w_tr_right_smoothed_cl[:-1], w_tr_left_smoothed_cl[:-1]))
+
+    # interpolate banking if given (linear)
+    if track_cl.shape[1] == 5:
+        banking_smoothed_cl = np.interp(np.linspace(0.0, 1.0, no_points_reg_cl), closest_t_glob_cl, track_cl[:, 4])
+        track_reg = np.column_stack((track_reg, banking_smoothed_cl))
 
     return track_reg
 

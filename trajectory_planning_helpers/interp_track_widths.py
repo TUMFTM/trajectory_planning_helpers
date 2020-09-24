@@ -16,7 +16,8 @@ def interp_track_widths(w_track: np.ndarray,
     in the track widths can disappear if the stepsize is too large (kind of an aliasing effect).
 
     .. inputs::
-    :param w_track:         array containing the track widths [w_track_right, w_track_left] to interpolate (unit meters)
+    :param w_track:         array containing the track widths in meters [w_track_right, w_track_left] to interpolate,
+                            optionally with banking angle in rad: [w_track_right, w_track_left, banking]
     :type w_track:          np.ndarray
     :param spline_inds:     indices that show which spline (and here w_track element) shall be interpolated.
     :type spline_inds:      np.ndarray
@@ -26,7 +27,7 @@ def interp_track_widths(w_track: np.ndarray,
     :type incl_last_point:  bool
 
     .. outputs::
-    :return w_track_interp: array with interpolated track widths.
+    :return w_track_interp: array with interpolated track widths (and optionally banking angle).
     :rtype w_track_interp:  np.ndarray
 
     .. notes::
@@ -41,10 +42,10 @@ def interp_track_widths(w_track: np.ndarray,
     no_interp_points = t_values.size  # unclosed
 
     if incl_last_point:
-        w_track_interp = np.zeros((no_interp_points + 1, 2))
+        w_track_interp = np.zeros((no_interp_points + 1, w_track.shape[1]))
         w_track_interp[-1] = w_track_cl[-1]
     else:
-        w_track_interp = np.zeros((no_interp_points, 2))
+        w_track_interp = np.zeros((no_interp_points, w_track.shape[1]))
 
     # loop through every interpolation point
     for i in range(no_interp_points):
@@ -52,8 +53,11 @@ def interp_track_widths(w_track: np.ndarray,
         ind_spl = spline_inds[i]
 
         # calculate track widths (linear approximation assumed along one spline)
-        w_track_interp[i, 0] = np.interp(t_values[i], (0.0, 1.0), w_track_cl[ind_spl:ind_spl+2, 0])
-        w_track_interp[i, 1] = np.interp(t_values[i], (0.0, 1.0), w_track_cl[ind_spl:ind_spl+2, 1])
+        w_track_interp[i, 0] = np.interp(t_values[i], (0.0, 1.0), w_track_cl[ind_spl:ind_spl + 2, 0])
+        w_track_interp[i, 1] = np.interp(t_values[i], (0.0, 1.0), w_track_cl[ind_spl:ind_spl + 2, 1])
+
+        if w_track.shape[1] == 3:
+            w_track_interp[i, 2] = np.interp(t_values[i], (0.0, 1.0), w_track_cl[ind_spl:ind_spl + 2, 2])
 
     return w_track_interp
 
