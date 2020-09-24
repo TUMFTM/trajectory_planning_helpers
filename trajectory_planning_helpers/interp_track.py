@@ -45,12 +45,7 @@ def interp_track(track: np.ndarray,
     dists_interp_cl = np.linspace(0.0, dists_cum_cl[-1], no_points_interp_cl)
 
     # interpolate closed track points
-    if track_cl.shape[1] == 4:
-        track_interp_cl = np.zeros((no_points_interp_cl, 4))
-    elif track_cl.shape[1] == 5:
-        track_interp_cl = np.zeros((no_points_interp_cl, 4))
-    else:
-        raise ValueError("Unknown track format!")
+    track_interp_cl = np.zeros((no_points_interp_cl, track_cl.shape[1]))
 
     track_interp_cl[:, 0] = np.interp(dists_interp_cl, dists_cum_cl, track_cl[:, 0])
     track_interp_cl[:, 1] = np.interp(dists_interp_cl, dists_cum_cl, track_cl[:, 1])
