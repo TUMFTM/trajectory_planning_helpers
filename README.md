@@ -15,7 +15,8 @@ not work properly on a common street network.
 * `calc_splines`: Calculate splines for a (closable) path.
 * `calc_t_profile`: Calculate the temporal duration profile for a given velocity profile.
 * `calc_tangent_vectors`: Calculate normalized tangent vectors on the basis of headings psi.
-* `calc_vel_profile`: Calculate velocity profile on the basis of a forward/backward solver.
+* `calc_vel_profile`: Calculate velocity profile on the basis of a forward/backward solver. Important: ax_max_machines
+input must be inserted without drag resistance, i.e. simply by calculating F_x_drivetrain / m_veh
 * `calc_vel_profile_brake`: Calculate velocity profile on the basis of a pure forward solver.
 * `check_normals_crossing`: Check if normal vectors of a given track have at least one crossing.
 * `conv_filt`: Filter a given signal using a 1D convolution (moving average) filter.

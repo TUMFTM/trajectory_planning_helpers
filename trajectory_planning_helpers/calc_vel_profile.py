@@ -29,7 +29,8 @@ def calc_vel_profile(ax_max_machines: np.ndarray,
 
     .. inputs::
     :param ax_max_machines: longitudinal acceleration limits by the electrical motors: [vx, ax_max_machines]. Velocity
-                            in m/s, accelerations in m/s2. They should be handed in without considering drag resistance.
+                            in m/s, accelerations in m/s2. They should be handed in without considering drag resistance,
+                            i.e. simply by calculating F_x_drivetrain / m_veh
     :type ax_max_machines:  np.ndarray
     :param kappa:           curvature profile of given trajectory in rad/m (always unclosed).
     :type kappa:            np.ndarray
