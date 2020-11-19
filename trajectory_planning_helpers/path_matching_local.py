@@ -6,7 +6,8 @@ from typing import Union
 def path_matching_local(path: np.ndarray,
                         ego_position: np.ndarray,
                         consider_as_closed: bool = False,
-                        s_tot: Union[float, None] = None) -> tuple:
+                        s_tot: Union[float, None] = None,
+                        no_interp_values: int = 11) -> tuple:
     """
     author:
     Alexander Heilmeier
@@ -24,6 +25,9 @@ def path_matching_local(path: np.ndarray,
     :type consider_as_closed:   bool
     :param s_tot:               Total length of path in m.
     :type s_tot:                Union[float, None]
+    :param no_interp_values:    Number of interpolation points that are created between the two closest points on the
+                                path to obtain a more accurate result.
+    :type no_interp_values:     int
 
     .. outputs::
     :return s_interp:           Interpolated s position of the vehicle in m.
@@ -97,7 +101,6 @@ def path_matching_local(path: np.ndarray,
             s_curs[1] = s_tot
 
     # interpolate between those points (linear) for better positioning
-    no_interp_values = 11
     t_lin = np.linspace(0.0, 1.0, no_interp_values)  # set relative lengths that are evaluated for interpolation
     x_cg_interp = np.linspace(a_pos[0], b_pos[0], no_interp_values)
     y_cg_interp = np.linspace(a_pos[1], b_pos[1], no_interp_values)
