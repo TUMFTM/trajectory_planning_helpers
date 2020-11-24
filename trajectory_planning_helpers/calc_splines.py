@@ -65,10 +65,10 @@ def calc_splines(path: np.ndarray,
 
     # check inputs
     if not closed and (psi_s is None or psi_e is None):
-        raise ValueError("Headings must be provided for unclosed spline calculation!")
+        raise RuntimeError("Headings must be provided for unclosed spline calculation!")
 
     if el_lengths is not None and path.shape[0] != el_lengths.size + 1:
-        raise ValueError("el_lengths input must be one element smaller than path input!")
+        raise RuntimeError("el_lengths input must be one element smaller than path input!")
 
     # if distances between path coordinates are not provided but required, calculate euclidean distances as el_lengths
     if use_dist_scaling and el_lengths is None:

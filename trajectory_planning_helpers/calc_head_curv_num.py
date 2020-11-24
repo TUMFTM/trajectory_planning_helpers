@@ -55,10 +55,10 @@ def calc_head_curv_num(path: np.ndarray,
 
     # check inputs
     if is_closed and path.shape[0] != el_lengths.size:
-        raise ValueError("path and el_lenghts must have the same length!")
+        raise RuntimeError("path and el_lenghts must have the same length!")
 
     elif not is_closed and path.shape[0] != el_lengths.size + 1:
-        raise ValueError("path must have the length of el_lengths + 1!")
+        raise RuntimeError("path must have the length of el_lengths + 1!")
 
     # get number if points
     no_points = path.shape[0]

@@ -34,7 +34,7 @@ def conv_filt(signal: np.ndarray,
 
     # check if window width is odd
     if not filt_window % 2 == 1:
-        raise ValueError("Window width of moving average filter must be odd!")
+        raise RuntimeError("Window width of moving average filter must be odd!")
 
     # calculate half window width - 1
     w_window_half = int((filt_window - 1) / 2)

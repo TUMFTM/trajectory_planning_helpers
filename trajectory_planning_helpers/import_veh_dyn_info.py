@@ -39,7 +39,7 @@ def import_veh_dyn_info(ggv_import_path: str = None,
 
         # check columns
         if ggv.shape[1] != 3:
-            raise ValueError("ggv diagram must consist of the three columns [vx, ax_max, ay_max]!")
+            raise RuntimeError("ggv diagram must consist of the three columns [vx, ax_max, ay_max]!")
 
         # check values
         invalid_1 = ggv[:, 0] < 0.0     # assure velocities > 0.0
@@ -48,7 +48,7 @@ def import_veh_dyn_info(ggv_import_path: str = None,
         invalid_4 = ggv[:, 2] < 0.0     # assure positive accelerations
 
         if np.any(invalid_1) or np.any(invalid_2) or np.any(invalid_3) or np.any(invalid_4):
-            raise ValueError("ggv seems unreasonable!")
+            raise RuntimeError("ggv seems unreasonable!")
 
     else:
         ggv = None
@@ -66,7 +66,7 @@ def import_veh_dyn_info(ggv_import_path: str = None,
 
         # check columns
         if ax_max_machines.shape[1] != 2:
-            raise ValueError("ax_max_machines must consist of the two columns [vx, ax_max_machines]!")
+            raise RuntimeError("ax_max_machines must consist of the two columns [vx, ax_max_machines]!")
 
         # check values
         invalid_1 = ax_max_machines[:, 0] < 0.0     # assure velocities > 0.0
@@ -74,7 +74,7 @@ def import_veh_dyn_info(ggv_import_path: str = None,
         invalid_3 = ax_max_machines[:, 1] < 0.0     # assure positive accelerations
 
         if np.any(invalid_1) or np.any(invalid_2) or np.any(invalid_3):
-            raise ValueError("ax_max_machines seems unreasonable!")
+            raise RuntimeError("ax_max_machines seems unreasonable!")
 
     else:
         ax_max_machines = None

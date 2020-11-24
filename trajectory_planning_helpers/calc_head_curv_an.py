@@ -40,10 +40,10 @@ def calc_head_curv_an(coeffs_x: np.ndarray,
 
     # check inputs
     if coeffs_x.shape[0] != coeffs_y.shape[0]:
-        raise ValueError("Coefficient matrices must have the same length!")
+        raise RuntimeError("Coefficient matrices must have the same length!")
 
     if ind_spls.size != t_spls.size:
-        raise ValueError("ind_spls and t_spls must have the same length!")
+        raise RuntimeError("ind_spls and t_spls must have the same length!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # CALCULATE HEADING ------------------------------------------------------------------------------------------------

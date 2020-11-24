@@ -33,8 +33,8 @@ def check_normals_crossing(track: np.ndarray,
     no_points = track.shape[0]
 
     if horizon >= no_points:
-        raise ValueError("Horizon of %i points is too large for a track with %i points, reduce horizon!"
-                         % (horizon, no_points))
+        raise RuntimeError("Horizon of %i points is too large for a track with %i points, reduce horizon!"
+                           % (horizon, no_points))
 
     elif horizon >= no_points / 2:
         print("WARNING: Horizon of %i points makes no sense for a track with %i points, reduce horizon!"

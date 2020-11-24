@@ -41,7 +41,7 @@ def path_matching_local(path: np.ndarray,
     # ------------------------------------------------------------------------------------------------------------------
 
     if path.shape[1] != 3:
-        raise ValueError("Inserted path must have 3 columns [s, x, y]!")
+        raise RuntimeError("Inserted path must have 3 columns [s, x, y]!")
 
     if consider_as_closed and s_tot is None:
         print("WARNING: s_tot is not handed into path_matching_local function! Estimating s_tot on the basis of equal"

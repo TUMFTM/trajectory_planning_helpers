@@ -46,14 +46,14 @@ def get_rel_path_part(path_cl: np.ndarray,
 
     # check distance input
     if s_dist_back + s_dist_forw >= s_tot:
-        raise ValueError('Summed distance inputs are greater or equal to the total distance of the given path!')
+        raise RuntimeError('Summed distance inputs are greater or equal to the total distance of the given path!')
 
     # check boundaries
     if bound_right_cl is not None and bound_right_cl.shape[0] != path_cl.shape[0]:
-        raise ValueError('Inserted right boundary does not have the same number of points as the path!')
+        raise RuntimeError('Inserted right boundary does not have the same number of points as the path!')
 
     if bound_left_cl is not None and bound_left_cl.shape[0] != path_cl.shape[0]:
-        raise ValueError('Inserted left boundary does not have the same number of points as the path!')
+        raise RuntimeError('Inserted left boundary does not have the same number of points as the path!')
 
     # cut s position if it exceeds the path length
     if s_pos >= s_tot:

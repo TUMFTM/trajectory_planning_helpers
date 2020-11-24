@@ -37,10 +37,10 @@ def calc_t_profile(vx_profile: np.ndarray,
 
     # check inputs
     if vx_profile.size < el_lengths.size:
-        raise ValueError("vx_profile and el_lenghts must have at least the same length!")
+        raise RuntimeError("vx_profile and el_lenghts must have at least the same length!")
 
     if ax_profile is not None and ax_profile.size < el_lengths.size:
-        raise ValueError("ax_profile and el_lenghts must have at least the same length!")
+        raise RuntimeError("ax_profile and el_lenghts must have at least the same length!")
 
     # calculate acceleration profile if required
     if ax_profile is None:

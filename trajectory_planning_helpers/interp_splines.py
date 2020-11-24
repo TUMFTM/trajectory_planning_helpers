@@ -54,22 +54,22 @@ def interp_splines(coeffs_x: np.ndarray,
 
     # check sizes
     if coeffs_x.shape[0] != coeffs_y.shape[0]:
-        raise ValueError("Coefficient matrices must have the same length!")
+        raise RuntimeError("Coefficient matrices must have the same length!")
 
     if spline_lengths is not None and coeffs_x.shape[0] != spline_lengths.size:
-        raise ValueError("coeffs_x/y and spline_lengths must have the same length!")
+        raise RuntimeError("coeffs_x/y and spline_lengths must have the same length!")
 
     # check if coeffs_x and coeffs_y have exactly two dimensions and raise error otherwise
     if not (coeffs_x.ndim == 2 and coeffs_y.ndim == 2):
-        raise ValueError("Coefficient matrices do not have two dimensions!")
+        raise RuntimeError("Coefficient matrices do not have two dimensions!")
 
     # check if step size specification is valid
     if (stepsize_approx is None and stepnum_fixed is None) \
             or (stepsize_approx is not None and stepnum_fixed is not None):
-        raise ValueError("Provide one of 'stepsize_approx' and 'stepnum_fixed' and set the other to 'None'!")
+        raise RuntimeError("Provide one of 'stepsize_approx' and 'stepnum_fixed' and set the other to 'None'!")
 
     if stepnum_fixed is not None and len(stepnum_fixed) != coeffs_x.shape[0]:
-        raise ValueError("The provided list 'stepnum_fixed' must hold an entry for every spline!")
+        raise RuntimeError("The provided list 'stepnum_fixed' must hold an entry for every spline!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # CALCULATE NUMBER OF INTERPOLATION POINTS AND ACCORDING DISTANCES -------------------------------------------------

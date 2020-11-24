@@ -47,7 +47,7 @@ def opt_shortest_path(reftrack: np.ndarray,
 
     # check inputs
     if no_points != normvectors.shape[0]:
-        raise ValueError("Array size of reftrack should be the same as normvectors!")
+        raise RuntimeError("Array size of reftrack should be the same as normvectors!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # SET UP FINAL MATRICES FOR SOLVER ---------------------------------------------------------------------------------

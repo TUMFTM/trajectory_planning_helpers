@@ -62,37 +62,37 @@ def calc_vel_profile_brake(kappa: np.ndarray,
 
     # check deceleration input
     if decel_max is not None and not decel_max < 0.0:
-        raise ValueError("Deceleration input must be negative!")
+        raise RuntimeError("Deceleration input must be negative!")
 
     # check if either ggv (and optionally mu) or loc_gg are handed in
     if (ggv is not None or mu is not None) and loc_gg is not None:
-        raise ValueError("Either ggv and optionally mu OR loc_gg must be supplied, not both (or all) of them!")
+        raise RuntimeError("Either ggv and optionally mu OR loc_gg must be supplied, not both (or all) of them!")
 
     if ggv is None and loc_gg is None:
-        raise ValueError("Either ggv or loc_gg must be supplied!")
+        raise RuntimeError("Either ggv or loc_gg must be supplied!")
 
     # check shape of loc_gg
     if loc_gg is not None:
         if loc_gg.ndim != 2:
-            raise ValueError("loc_gg must have two dimensions!")
+            raise RuntimeError("loc_gg must have two dimensions!")
 
         if loc_gg.shape[0] != kappa.size:
-            raise ValueError("Length of loc_gg and kappa must be equal!")
+            raise RuntimeError("Length of loc_gg and kappa must be equal!")
 
         if loc_gg.shape[1] != 2:
-            raise ValueError("loc_gg must consist of two columns: [ax_max, ay_max]!")
+            raise RuntimeError("loc_gg must consist of two columns: [ax_max, ay_max]!")
 
     # check shape of ggv
     if ggv is not None and ggv.shape[1] != 3:
-        raise ValueError("ggv diagram must consist of the three columns [vx, ax_max, ay_max]!")
+        raise RuntimeError("ggv diagram must consist of the three columns [vx, ax_max, ay_max]!")
 
     # check size of mu
     if mu is not None and kappa.size != mu.size:
-        raise ValueError("kappa and mu must have the same length!")
+        raise RuntimeError("kappa and mu must have the same length!")
 
     # check size of kappa and element lengths
     if kappa.size != el_lengths.size + 1:
-        raise ValueError("kappa must have the length of el_lengths + 1!")
+        raise RuntimeError("kappa must have the length of el_lengths + 1!")
 
     # check start and end velocities
     if v_start < 0.0:
@@ -105,7 +105,7 @@ def calc_vel_profile_brake(kappa: np.ndarray,
 
     # check if ggv covers velocity until v_start
     if ggv is not None and ggv[-1, 0] < v_start:
-        raise ValueError("ggv has to cover the entire velocity range of the car (i.e. >= v_start)!")
+        raise RuntimeError("ggv has to cover the entire velocity range of the car (i.e. >= v_start)!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # BRINGING GGV OR LOC_GG INTO SHAPE FOR EQUAL HANDLING AFTERWARDS --------------------------------------------------

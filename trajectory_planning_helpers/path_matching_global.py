@@ -42,7 +42,7 @@ def path_matching_global(path_cl: np.ndarray,
     # ------------------------------------------------------------------------------------------------------------------
 
     if path_cl.shape[1] != 3:
-        raise ValueError("Inserted path must have 3 columns [s, x, y]!")
+        raise RuntimeError("Inserted path must have 3 columns [s, x, y]!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # GET RELEVANT PART OF PATH FOR EXPECTED S -------------------------------------------------------------------------

@@ -66,10 +66,10 @@ def opt_min_curv(reftrack: np.ndarray,
 
     # check inputs
     if no_points != normvectors.shape[0]:
-        raise ValueError("Array size of reftrack should be the same as normvectors!")
+        raise RuntimeError("Array size of reftrack should be the same as normvectors!")
 
     if no_points * 4 != A.shape[0] or A.shape[0] != A.shape[1]:
-        raise ValueError("Spline equation system matrix A has wrong dimensions!")
+        raise RuntimeError("Spline equation system matrix A has wrong dimensions!")
 
     # create extraction matrix -> only b_i coefficients of the solved linear equation system are needed for gradient
     # information
@@ -236,7 +236,7 @@ def opt_min_curv(reftrack: np.ndarray,
 
     # check that there is space remaining between left and right maximum deviation (both can be negative as well!)
     if np.any(-dev_max_right > dev_max_left) or np.any(-dev_max_left > dev_max_right):
-        raise ValueError("Problem not solvable, track might be too small to run with current safety distance!")
+        raise RuntimeError("Problem not solvable, track might be too small to run with current safety distance!")
 
     # consider value boundaries (-dev_max_left <= alpha <= dev_max_right)
     G = np.vstack((np.eye(no_points), -np.eye(no_points), E_kappa, -E_kappa))

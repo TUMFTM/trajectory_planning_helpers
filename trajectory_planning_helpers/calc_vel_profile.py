@@ -83,40 +83,40 @@ def calc_vel_profile(ax_max_machines: np.ndarray,
 
     # check if either ggv (and optionally mu) or loc_gg are handed in
     if (ggv is not None or mu is not None) and loc_gg is not None:
-        raise ValueError("Either ggv and optionally mu OR loc_gg must be supplied, not both (or all) of them!")
+        raise RuntimeError("Either ggv and optionally mu OR loc_gg must be supplied, not both (or all) of them!")
 
     if ggv is None and loc_gg is None:
-        raise ValueError("Either ggv or loc_gg must be supplied!")
+        raise RuntimeError("Either ggv or loc_gg must be supplied!")
 
     # check shape of loc_gg
     if loc_gg is not None:
         if loc_gg.ndim != 2:
-            raise ValueError("loc_gg must have two dimensions!")
+            raise RuntimeError("loc_gg must have two dimensions!")
 
         if loc_gg.shape[0] != kappa.size:
-            raise ValueError("Length of loc_gg and kappa must be equal!")
+            raise RuntimeError("Length of loc_gg and kappa must be equal!")
 
         if loc_gg.shape[1] != 2:
-            raise ValueError("loc_gg must consist of two columns: [ax_max, ay_max]!")
+            raise RuntimeError("loc_gg must consist of two columns: [ax_max, ay_max]!")
 
     # check shape of ggv
     if ggv is not None and ggv.shape[1] != 3:
-        raise ValueError("ggv diagram must consist of the three columns [vx, ax_max, ay_max]!")
+        raise RuntimeError("ggv diagram must consist of the three columns [vx, ax_max, ay_max]!")
 
     # check size of mu
     if mu is not None and kappa.size != mu.size:
-        raise ValueError("kappa and mu must have the same length!")
+        raise RuntimeError("kappa and mu must have the same length!")
 
     # check size of kappa and element lengths
     if closed and kappa.size != el_lengths.size:
-        raise ValueError("kappa and el_lengths must have the same length if closed!")
+        raise RuntimeError("kappa and el_lengths must have the same length if closed!")
 
     elif not closed and kappa.size != el_lengths.size + 1:
-        raise ValueError("kappa must have the length of el_lengths + 1 if unclosed!")
+        raise RuntimeError("kappa must have the length of el_lengths + 1 if unclosed!")
 
     # check start and end velocities
     if not closed and v_start is None:
-        raise ValueError("v_start must be provided for the unclosed case!")
+        raise RuntimeError("v_start must be provided for the unclosed case!")
 
     if v_start is not None and v_start < 0.0:
         v_start = 0.0
@@ -132,23 +132,23 @@ def calc_vel_profile(ax_max_machines: np.ndarray,
 
     # check shape of ax_max_machines
     if ax_max_machines.shape[1] != 2:
-        raise ValueError("ax_max_machines must consist of the two columns [vx, ax_max_machines]!")
+        raise RuntimeError("ax_max_machines must consist of the two columns [vx, ax_max_machines]!")
 
     # check v_max
     if v_max is None:
         if ggv is None:
-            raise ValueError("v_max must be supplied if ggv is None!")
+            raise RuntimeError("v_max must be supplied if ggv is None!")
         else:
             v_max = min(ggv[-1, 0], ax_max_machines[-1, 0])
 
     else:
         # check if ggv covers velocity until v_max
         if ggv is not None and ggv[-1, 0] < v_max:
-            raise ValueError("ggv has to cover the entire velocity range of the car (i.e. >= v_max)!")
+            raise RuntimeError("ggv has to cover the entire velocity range of the car (i.e. >= v_max)!")
 
         # check if ax_max_machines covers velocity until v_max
         if ax_max_machines[-1, 0] < v_max:
-            raise ValueError("ax_max_machines has to cover the entire velocity range of the car (i.e. >= v_max)!")
+            raise RuntimeError("ax_max_machines has to cover the entire velocity range of the car (i.e. >= v_max)!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # BRINGING GGV OR LOC_GG INTO SHAPE FOR EQUAL HANDLING AFTERWARDS --------------------------------------------------
@@ -547,13 +547,13 @@ def calc_ax_poss(vx_start: float,
 
     # check inputs
     if mode not in ['accel_forw', 'decel_forw', 'decel_backw']:
-        raise ValueError("Unknown operation mode for calc_ax_poss!")
+        raise RuntimeError("Unknown operation mode for calc_ax_poss!")
 
     if mode == 'accel_forw' and ax_max_machines is None:
-        raise ValueError("ax_max_machines is required if operation mode is accel_forw!")
+        raise RuntimeError("ax_max_machines is required if operation mode is accel_forw!")
 
     if ggv.ndim != 2 or ggv.shape[1] != 3:
-        raise ValueError("ggv must have two dimensions and three columns [vx, ax_max, ay_max]!")
+        raise RuntimeError("ggv must have two dimensions and three columns [vx, ax_max, ay_max]!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # CONSIDER TIRE POTENTIAL ------------------------------------------------------------------------------------------

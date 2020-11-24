@@ -34,7 +34,7 @@ def calc_ax_profile(vx_profile: np.ndarray,
 
     # check inputs
     if vx_profile.size != el_lengths.size + 1:
-        raise ValueError("Array size of vx_profile should be 1 element bigger than el_lengths!")
+        raise RuntimeError("Array size of vx_profile should be 1 element bigger than el_lengths!")
 
     # calculate longitudinal acceleration profile array numerically: (v_end^2 - v_beg^2) / 2*s
     if eq_length_output:

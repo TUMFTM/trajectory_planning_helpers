@@ -26,7 +26,7 @@ def import_veh_dyn_info_2(filepath2localgg: str = "") -> np.ndarray:
 
     # raise error if no path is provided
     if not filepath2localgg:
-        raise ValueError('Missing path to file which contains vehicle acceleration limits!')
+        raise RuntimeError('Missing path to file which contains vehicle acceleration limits!')
 
     # load localgg file
     with open(filepath2localgg, 'rb') as fh:
@@ -39,37 +39,37 @@ def import_veh_dyn_info_2(filepath2localgg: str = "") -> np.ndarray:
     if data_localggfile.ndim == 1:
 
         if data_localggfile.size != 5:
-            raise ValueError('TPA MapInterface: wrong shape of localgg file data -> five columns required!')
+            raise RuntimeError('TPA MapInterface: wrong shape of localgg file data -> five columns required!')
 
         tpamap = np.hstack((np.zeros(3), data_localggfile[3:5]))[np.newaxis, :]
 
     elif data_localggfile.ndim == 2:
 
         if data_localggfile.shape[1] != 5:
-            raise ValueError('TPA MapInterface: wrong shape of localgg file data -> five columns required!')
+            raise RuntimeError('TPA MapInterface: wrong shape of localgg file data -> five columns required!')
 
         tpamap = data_localggfile
 
         if np.any(tpamap[:, 0] < 0.0):
-            raise ValueError('TPA MapInterface: one or more s-coordinate values are smaller than zero!')
+            raise RuntimeError('TPA MapInterface: one or more s-coordinate values are smaller than zero!')
 
         if np.any(np.diff(tpamap[:, 0]) <= 0.0):
-            raise ValueError('TPA MapInterface: s-coordinates are not strictly monotone increasing!')
+            raise RuntimeError('TPA MapInterface: s-coordinates are not strictly monotone increasing!')
 
         # check whether endpoint and start point of s is close together in xy
         if not np.isclose(np.hypot(tpamap[0, 1] - tpamap[-1, 1], tpamap[0, 2] - tpamap[-1, 2]), 0.0):
-            raise ValueError('TPA MapInterface: s-coordinates representing the race track are not closed; '
-                             'first and last point are not equal!')
+            raise RuntimeError('TPA MapInterface: s-coordinates representing the race track are not closed; '
+                               'first and last point are not equal!')
 
     else:
-        raise ValueError("Localgg file must provide one or two dimensions!")
+        raise RuntimeError("Localgg file must provide one or two dimensions!")
 
     # check local acceleration limits for validity
     if np.any(tpamap[:, 3:] > 20.0):
-        raise ValueError('TPA MapInterface: max. acceleration limit in localgg file exceeds 20 m/s^2!')
+        raise RuntimeError('TPA MapInterface: max. acceleration limit in localgg file exceeds 20 m/s^2!')
 
     if np.any(tpamap[:, 3:] < 1.0):
-        raise ValueError('TPA MapInterface: min. acceleration limit in localgg file is below 1 m/s^2!')
+        raise RuntimeError('TPA MapInterface: min. acceleration limit in localgg file is below 1 m/s^2!')
 
     return tpamap
 

@@ -38,7 +38,7 @@ def calc_spline_lengths(coeffs_x: np.ndarray,
 
     # check inputs
     if coeffs_x.shape[0] != coeffs_y.shape[0]:
-        raise ValueError("Coefficient matrices must have the same length!")
+        raise RuntimeError("Coefficient matrices must have the same length!")
 
     # catch case with only one spline
     if coeffs_x.size == 4 and coeffs_x.shape[0] == 4:
