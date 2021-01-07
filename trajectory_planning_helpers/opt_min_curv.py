@@ -341,4 +341,45 @@ def opt_min_curv(reftrack: np.ndarray,
 
 # testing --------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    pass
+    import os
+    import sys
+    import matplotlib.pyplot as plt
+
+    sys.path.append(os.path.dirname(__file__))
+    from interp_splines import interp_splines
+    from calc_splines import calc_splines
+
+    # --- PARAMETERS ---
+    N_PTS = 50
+    radius = 20.0
+    track_width = 4.0
+
+    # --- IMPORT TRACK ---
+    # load data from csv file
+    csv_data_temp = np.loadtxt(os.path.dirname(__file__) + '/../example_files/berlin_2018.csv',
+                               comments='#', delimiter=',')
+
+    # get coords and track widths out of array
+    reftrack = csv_data_temp[:, 0:4]
+
+    # --- CALCULATE MIN CURV ---
+    coeffs_x, coeffs_y, M, normvec_norm = calc_splines(path=np.vstack((reftrack[:, 0:2], reftrack[0, 0:2])))
+
+    alpha_mincurv, curv_error_max = opt_min_curv(reftrack=reftrack,
+                                                 normvectors=normvec_norm,
+                                                 A=M,
+                                                 kappa_bound=0.4,
+                                                 w_veh=2.0)
+
+    # --- PLOT RESULTS ---
+    path_result = reftrack[:, 0:2] + normvec_norm * np.expand_dims(alpha_mincurv, axis=1)
+    bound1 = reftrack[:, 0:2] - normvec_norm * np.expand_dims(reftrack[:, 2], axis=1)
+    bound2 = reftrack[:, 0:2] + normvec_norm * np.expand_dims(reftrack[:, 3], axis=1)
+
+    plt.plot(reftrack[:, 0], reftrack[:, 1], ":")
+    plt.plot(path_result[:, 0], path_result[:, 1])
+    plt.plot(bound1[:, 0], bound1[:, 1], 'k')
+    plt.plot(bound2[:, 0], bound2[:, 1], 'k')
+    plt.axis('equal')
+    plt.show()
+
