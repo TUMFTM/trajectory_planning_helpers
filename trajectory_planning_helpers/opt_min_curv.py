@@ -350,9 +350,7 @@ if __name__ == "__main__":
     from calc_splines import calc_splines
 
     # --- PARAMETERS ---
-    N_PTS = 50
-    radius = 20.0
-    track_width = 4.0
+    CLOSED = True
 
     # --- IMPORT TRACK ---
     # load data from csv file
@@ -361,15 +359,29 @@ if __name__ == "__main__":
 
     # get coords and track widths out of array
     reftrack = csv_data_temp[:, 0:4]
+    psi_s = 0.0
+    psi_e = 2.0
 
     # --- CALCULATE MIN CURV ---
-    coeffs_x, coeffs_y, M, normvec_norm = calc_splines(path=np.vstack((reftrack[:, 0:2], reftrack[0, 0:2])))
+    if CLOSED:
+        coeffs_x, coeffs_y, M, normvec_norm = calc_splines(path=np.vstack((reftrack[:, 0:2], reftrack[0, 0:2])))
+    else:
+        reftrack = reftrack[200:600, :]
+        coeffs_x, coeffs_y, M, normvec_norm = calc_splines(path=reftrack[:, 0:2],
+                                                           psi_s=psi_s,
+                                                           psi_e=psi_e)
+
+        # extend norm-vec to same size of ref track (quick fix for testing only)
+        normvec_norm = np.vstack((normvec_norm[0, :], normvec_norm))
 
     alpha_mincurv, curv_error_max = opt_min_curv(reftrack=reftrack,
                                                  normvectors=normvec_norm,
                                                  A=M,
                                                  kappa_bound=0.4,
-                                                 w_veh=2.0)
+                                                 w_veh=2.0,
+                                                 closed=CLOSED,
+                                                 psi_s=psi_s,
+                                                 psi_e=psi_e)
 
     # --- PLOT RESULTS ---
     path_result = reftrack[:, 0:2] + normvec_norm * np.expand_dims(alpha_mincurv, axis=1)
