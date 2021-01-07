@@ -12,14 +12,22 @@ def opt_min_curv(reftrack: np.ndarray,
                  kappa_bound: float,
                  w_veh: float,
                  print_debug: bool = False,
-                 plot_debug: bool = False) -> tuple:
+                 plot_debug: bool = False,
+                 closed: bool = True,
+                 psi_s: float = None,
+                 psi_e: float = None) -> tuple:
     """
     author:
     Alexander Heilmeier
+    Tim Stahl
+    Alexander Wischnewski
+    Levent Ögretmen
 
     .. description::
     This function uses a QP solver to minimize the summed curvature of a path by moving the path points along their
-    normal vectors within the track width.
+    normal vectors within the track width. The function can be used for closed and unclosed tracks. For unclosed tracks
+    the heading psi_s and psi_e is enforced on the first and last point of the reftrack. Furthermore, in case of an
+    unclosed track, the first and last point of the reftrack are not subject to optimization and stay same.
 
     Please refer to our paper for further information:
     Heilmeier, Wischnewski, Hermansdorfer, Betz, Lienkamp, Lohmann
@@ -49,6 +57,12 @@ def opt_min_curv(reftrack: np.ndarray,
     :param plot_debug:  bool flag to plot the curvatures that are calculated based on the original linearization and on
                         a linearization around the solution.
     :type plot_debug:   bool
+    :param closed:      bool flag specifying whether a closed or unclosed track should be assumed
+    :type closed:       bool
+    :param psi_s:       heading to be enforced at the first point for unclosed tracks
+    :type psi_s:        float
+    :param psi_e:       heading to be enforced at the last point for unclosed tracks
+    :type psi_e:        float
 
     .. outputs::
     :return alpha_mincurv:  solution vector of the opt. problem containing the lateral shift in m for every point.
@@ -64,36 +78,49 @@ def opt_min_curv(reftrack: np.ndarray,
 
     no_points = reftrack.shape[0]
 
+    no_splines = no_points
+    if not closed:
+        no_splines -= 1
+
     # check inputs
     if no_points != normvectors.shape[0]:
         raise RuntimeError("Array size of reftrack should be the same as normvectors!")
 
-    if no_points * 4 != A.shape[0] or A.shape[0] != A.shape[1]:
+    if (no_points * 4 != A.shape[0] and closed) or (no_splines * 4 != A.shape[0] and not closed)\
+            or A.shape[0] != A.shape[1]:
         raise RuntimeError("Spline equation system matrix A has wrong dimensions!")
 
     # create extraction matrix -> only b_i coefficients of the solved linear equation system are needed for gradient
     # information
-    A_ex_b = np.zeros((no_points, no_points * 4), dtype=np.int)
+    A_ex_b = np.zeros((no_points, no_splines * 4), dtype=np.int)
 
-    for i in range(no_points):
+    for i in range(no_splines):
         A_ex_b[i, i * 4 + 1] = 1    # 1 * b_ix = E_x * x
+
+    # coefficients for end of spline (t = 1)
+    if not closed:
+        A_ex_b[-1, -4:] = np.array([0, 1, 2, 3])
 
     # create extraction matrix -> only c_i coefficients of the solved linear equation system are needed for curvature
     # information
-    A_ex_c = np.zeros((no_points, no_points * 4), dtype=np.int)
+    A_ex_c = np.zeros((no_points, no_splines * 4), dtype=np.int)
 
-    for i in range(no_points):
+    for i in range(no_splines):
         A_ex_c[i, i * 4 + 2] = 2    # 2 * c_ix = D_x * x
+
+    # coefficients for end of spline (t = 1)
+    if not closed:
+        A_ex_c[-1, -4:] = np.array([0, 0, 2, 6])
 
     # invert matrix A resulting from the spline setup linear equation system and apply extraction matrix
     A_inv = np.linalg.inv(A)
     T_c = np.matmul(A_ex_c, A_inv)
 
     # set up M_x and M_y matrices including the gradient information, i.e. bring normal vectors into matrix form
-    M_x = np.zeros((no_points * 4, no_points))
-    M_y = np.zeros((no_points * 4, no_points))
+    M_x = np.zeros((no_splines * 4, no_points))
+    M_y = np.zeros((no_splines * 4, no_points))
 
-    for i in range(no_points):
+    for i in range(no_splines):
         j = i * 4
 
         if i < no_points - 1:
@@ -110,10 +137,10 @@ def opt_min_curv(reftrack: np.ndarray,
             M_y[j + 1, 0] = normvectors[0, 1]
 
     # set up q_x and q_y matrices including the point coordinate information
-    q_x = np.zeros((no_points * 4, 1))
-    q_y = np.zeros((no_points * 4, 1))
+    q_x = np.zeros((no_splines * 4, 1))
+    q_y = np.zeros((no_splines * 4, 1))
 
-    for i in range(no_points):
+    for i in range(no_splines):
         j = i * 4
 
         if i < no_points - 1:
@@ -128,6 +155,14 @@ def opt_min_curv(reftrack: np.ndarray,
 
             q_y[j, 0] = reftrack[i, 1]
             q_y[j + 1, 0] = reftrack[0, 1]
+
+    # for unclosed tracks, specify start- and end-heading constraints
+    if not closed:
+        q_x[-2, 0] = math.cos(psi_s + math.pi / 2)
+        q_y[-2, 0] = math.sin(psi_s + math.pi / 2)
+
+        q_x[-1, 0] = math.cos(psi_e + math.pi / 2)
+        q_y[-1, 0] = math.sin(psi_e + math.pi / 2)
 
     # set up P_xx, P_xy, P_yy matrices
     x_prime = np.eye(no_points, no_points) * np.matmul(np.matmul(A_ex_b, A_inv), q_x)
@@ -233,6 +268,13 @@ def opt_min_curv(reftrack: np.ndarray,
     # calculate allowed deviation from refline
     dev_max_right = reftrack[:, 2] - w_veh / 2
     dev_max_left = reftrack[:, 3] - w_veh / 2
+
+    # constrain resulting path to reference line at start- and end-point for open tracks
+    if not closed:
+        dev_max_left[0] = 0.05
+        dev_max_left[-1] = 0.05
+        dev_max_right[0] = 0.05
+        dev_max_right[-1] = 0.05
 
     # check that there is space remaining between left and right maximum deviation (both can be negative as well!)
     if np.any(-dev_max_right > dev_max_left) or np.any(-dev_max_left > dev_max_right):
