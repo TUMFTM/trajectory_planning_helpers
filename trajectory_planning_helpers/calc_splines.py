@@ -58,7 +58,7 @@ def calc_splines(path: np.ndarray,
     """
 
     # check if path is closed
-    if np.all(np.isclose(path[0], path[-1])):
+    if np.all(np.isclose(path[0], path[-1])) and psi_s is None:
         closed = True
     else:
         closed = False
@@ -198,4 +198,24 @@ def calc_splines(path: np.ndarray,
 
 # testing --------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    pass
+    import os
+    import sys
+    import matplotlib.pyplot as plt
+    sys.path.append(os.path.dirname(__file__))
+    from interp_splines import interp_splines
+
+    path_coords = np.array([[50.0, 10.0], [10.0, 4.0], [0.0, 0.0]])
+    psi_s = np.pi / 2
+    psi_e = np.pi / 1.3
+    coeffs_x, coeffs_y = calc_splines(path=path_coords,
+                                      psi_s=psi_s,
+                                      psi_e=psi_e)[0:2]
+
+    path_interp = interp_splines(coeffs_x=coeffs_x,
+                                 coeffs_y=coeffs_y,
+                                 incl_last_point=True,
+                                 stepsize_approx=0.5)[0]
+
+    plt.plot(path_interp[:, 0], path_interp[:, 1])
+    plt.axis('equal')
+    plt.show()
