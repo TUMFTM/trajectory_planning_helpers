@@ -3,7 +3,6 @@ import math
 import quadprog
 # import cvxopt
 import time
-import matplotlib.pyplot as plt
 
 
 def opt_min_curv(reftrack: np.ndarray,
@@ -15,7 +14,9 @@ def opt_min_curv(reftrack: np.ndarray,
                  plot_debug: bool = False,
                  closed: bool = True,
                  psi_s: float = None,
-                 psi_e: float = None) -> tuple:
+                 psi_e: float = None,
+                 fix_s: bool = False,
+                 fix_e: bool = False) -> tuple:
     """
     author:
     Alexander Heilmeier
@@ -63,6 +64,10 @@ def opt_min_curv(reftrack: np.ndarray,
     :type psi_s:        float
     :param psi_e:       heading to be enforced at the last point for unclosed tracks
     :type psi_e:        float
+    :param fix_s:       determines if start point is fixed to reference line for unclosed tracks
+    :type fix_s:        bool
+    :param fix_e:       determines if last point is fixed to reference line for unclosed tracks
+    :type fix_e:        bool
 
     .. outputs::
     :return alpha_mincurv:  solution vector of the opt. problem containing the lateral shift in m for every point.
@@ -92,7 +97,7 @@ def opt_min_curv(reftrack: np.ndarray,
 
     # create extraction matrix -> only b_i coefficients of the solved linear equation system are needed for gradient
     # information
-    A_ex_b = np.zeros((no_points, no_splines * 4), dtype=np.int)
+    A_ex_b = np.zeros((no_points, no_splines * 4), dtype=int)
 
     for i in range(no_splines):
         A_ex_b[i, i * 4 + 1] = 1    # 1 * b_ix = E_x * x
@@ -103,7 +108,7 @@ def opt_min_curv(reftrack: np.ndarray,
 
     # create extraction matrix -> only c_i coefficients of the solved linear equation system are needed for curvature
     # information
-    A_ex_c = np.zeros((no_points, no_splines * 4), dtype=np.int)
+    A_ex_c = np.zeros((no_points, no_splines * 4), dtype=int)
 
     for i in range(no_splines):
         A_ex_c[i, i * 4 + 2] = 2    # 2 * c_ix = D_x * x
@@ -270,10 +275,12 @@ def opt_min_curv(reftrack: np.ndarray,
     dev_max_left = reftrack[:, 3] - w_veh / 2
 
     # constrain resulting path to reference line at start- and end-point for open tracks
-    if not closed:
+    if not closed and fix_s:
         dev_max_left[0] = 0.05
-        dev_max_left[-1] = 0.05
         dev_max_right[0] = 0.05
+
+    if not closed and fix_e:
+        dev_max_left[-1] = 0.05
         dev_max_right[-1] = 0.05
 
     # check that there is space remaining between left and right maximum deviation (both can be negative as well!)
@@ -344,9 +351,7 @@ if __name__ == "__main__":
     import os
     import sys
     import matplotlib.pyplot as plt
-
     sys.path.append(os.path.dirname(__file__))
-    from interp_splines import interp_splines
     from calc_splines import calc_splines
 
     # --- PARAMETERS ---
@@ -394,4 +399,3 @@ if __name__ == "__main__":
     plt.plot(bound2[:, 0], bound2[:, 1], 'k')
     plt.axis('equal')
     plt.show()
-

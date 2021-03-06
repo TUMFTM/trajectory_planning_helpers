@@ -99,7 +99,7 @@ def interp_splines(coeffs_x: np.ndarray,
 
     # create arrays to save the values
     path_interp = np.zeros((no_interp_points, 2))           # raceline coords (x, y) array
-    spline_inds = np.zeros(no_interp_points, dtype=np.int)  # save the spline index to which a point belongs
+    spline_inds = np.zeros(no_interp_points, dtype=int)  # save the spline index to which a point belongs
     t_values = np.zeros(no_interp_points)                   # save t values
 
     if stepsize_approx is not None:

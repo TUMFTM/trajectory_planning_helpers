@@ -205,14 +205,14 @@ if __name__ == "__main__":
     from interp_splines import interp_splines
 
     path_coords = np.array([[50.0, 10.0], [10.0, 4.0], [0.0, 0.0]])
-    psi_s = np.pi / 2
-    psi_e = np.pi / 1.3
-    coeffs_x, coeffs_y = calc_splines(path=path_coords,
-                                      psi_s=psi_s,
-                                      psi_e=psi_e)[0:2]
+    psi_s_ = np.pi / 2.0
+    psi_e_ = np.pi / 1.3
+    coeffs_x_, coeffs_y_ = calc_splines(path=path_coords,
+                                        psi_s=psi_s_,
+                                        psi_e=psi_e_)[0:2]
 
-    path_interp = interp_splines(coeffs_x=coeffs_x,
-                                 coeffs_y=coeffs_y,
+    path_interp = interp_splines(coeffs_x=coeffs_x_,
+                                 coeffs_y=coeffs_y_,
                                  incl_last_point=True,
                                  stepsize_approx=0.5)[0]
 

@@ -11,7 +11,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='trajectory-planning-helpers',
-    version='0.75',
+    version='0.76',
     url='https://github.com/TUMFTM/trajectory_planning_helpers',
     author="Alexander Heilmeier, Tim Stahl, Fabian Christ",
     author_email="alexander.heilmeier@tum.de, stahl@ftm.mw.tum.de",
