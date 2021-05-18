@@ -43,7 +43,7 @@ def import_veh_dyn_info(ggv_import_path: str = None,
 
         # check values
         invalid_1 = ggv[:, 0] < 0.0     # assure velocities > 0.0
-        invalid_2 = ggv[:, 1:] > 20.0   # assure valid maximum accelerations
+        invalid_2 = ggv[:, 1:] > 50.0   # assure valid maximum accelerations
         invalid_3 = ggv[:, 1] < 0.0     # assure positive accelerations
         invalid_4 = ggv[:, 2] < 0.0     # assure positive accelerations
 
