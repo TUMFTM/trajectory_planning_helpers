@@ -5,6 +5,10 @@ import trajectory_planning_helpers as tph
 def iqp_handler(reftrack: np.ndarray,
                 normvectors: np.ndarray,
                 A: np.ndarray,
+                spline_len: np.ndarray,
+                psi: np.ndarray,
+                kappa: np.ndarray,
+                dkappa: np.ndarray,
                 kappa_bound: float,
                 w_veh: float,
                 print_debug: bool,
@@ -16,6 +20,7 @@ def iqp_handler(reftrack: np.ndarray,
     """
     author:
     Alexander Heilmeier
+    Marvin Ochsenius
 
     .. description::
     This function handles the iterative call of the quadratic optimization problem (minimum curvature) during
@@ -45,6 +50,18 @@ def iqp_handler(reftrack: np.ndarray,
                                 -> System matrices have the form a_i, b_i * t, c_i * t^2, d_i * t^3
                                 -> see calc_splines.py for further information or to obtain this matrix
     :type A:                    np.ndarray
+    :param spline_len:          spline lengths for every point of the reference track [x, y]
+                                (unit is meter, must be unclosed!)
+    :type spline_len:           np.ndarray
+    :param psi:                 heading for every point of the reference track [x, y]
+                                (unit is rad, must be unclosed!)
+    :type psi:                  np.ndarray
+    :param kappa:               curvature for every point of the reference track [x, y]
+                                (unit is 1/m, must be unclosed!)
+    :type kappa:                np.ndarray
+    :param dkappa:              derivative of curvature for every point of the reference track [x, y]
+                                (unit is 1/m^2, must be unclosed!)
+    :type dkappa:               np.ndarray
     :param kappa_bound:         curvature boundary to consider during optimization.
     :type kappa_bound:          float
     :param w_veh:               vehicle width in m. It is considered during the calculation of the allowed deviations
@@ -73,6 +90,18 @@ def iqp_handler(reftrack: np.ndarray,
     :rtype reftrack_tmp:        np.ndarray
     :return normvectors_tmp:    normalized normal vectors as they were used in the final iteration of the IQP [x, y].
     :rtype normvectors_tmp:     np.ndarray
+    :return spline_len_tmp:     spline lengths of reference track data [x, y, w_tr_right, w_tr_left] as it was used in
+                                the final iteration of the IQP.
+    :rtype spline_len_tmp:      np.ndarray
+    :return psi_reftrack_tmp:   heading of reference track data [x, y, w_tr_right, w_tr_left] as it was used in the
+                                final iteration of the IQP.
+    :rtype psi_reftrack_tmp:    np.ndarray
+    :return kappa_reftrack_tmp: curvtaure of reference track data [x, y, w_tr_right, w_tr_left] as it was used in the
+                                final iteration of the IQP.
+    :rtype psi_reftrack_tmp:    np.ndarray
+    :return dkappa_reftrack_tmp:derivative of curvature of reference track data [x, y, w_tr_right, w_tr_left] as it was
+                                used in the final iteration of the IQP.
+    :rtype psi_reftrack_tmp:    np.ndarray
     """
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -83,6 +112,10 @@ def iqp_handler(reftrack: np.ndarray,
     reftrack_tmp = reftrack
     normvectors_tmp = normvectors
     A_tmp = A
+    spline_len_tmp = spline_len
+    psi_reftrack_tmp = psi
+    kappa_reftrack_tmp = kappa
+    dkappa_reftrack_tmp = dkappa
 
     # loop
     iter_cur = 0
@@ -147,7 +180,20 @@ def iqp_handler(reftrack: np.ndarray,
             calc_splines(path=refline_tmp_cl,
                          use_dist_scaling=False)
 
-    return alpha_mincurv_tmp, reftrack_tmp, normvectors_tmp
+        # calculate spline lengths
+        spline_len_tmp = tph.calc_spline_lengths.calc_spline_lengths(coeffs_x=coeffs_x_tmp, coeffs_y=coeffs_y_tmp)
+
+        # calculate heading, curvature, and first derivative of curvature (analytically)
+        psi_reftrack_tmp, kappa_reftrack_tmp, dkappa_reftrack_tmp = tph.calc_head_curv_an.calc_head_curv_an(
+            coeffs_x=coeffs_x_tmp,
+            coeffs_y=coeffs_y_tmp,
+            ind_spls=np.arange(reftrack_tmp.shape[0]),
+            t_spls=np.zeros(reftrack_tmp.shape[0]),
+            calc_dcurv=True
+        )
+
+    return alpha_mincurv_tmp, reftrack_tmp, normvectors_tmp, spline_len_tmp, psi_reftrack_tmp, kappa_reftrack_tmp,\
+           dkappa_reftrack_tmp
 
 
 # testing --------------------------------------------------------------------------------------------------------------

@@ -7,14 +7,16 @@ def calc_head_curv_an(coeffs_x: np.ndarray,
                       coeffs_y: np.ndarray,
                       ind_spls: np.ndarray,
                       t_spls: np.ndarray,
-                      calc_curv: bool = True) -> tuple:
+                      calc_curv: bool = True,
+                      calc_dcurv: bool = False) -> tuple:
     """
     author:
     Alexander Heilmeier
+    Marvin Ochsenius (dcurv extension)
 
     .. description::
-    Analytical calculation of heading psi and curvature kappa on the basis of third order splines for x- and
-    y-coordinate.
+    Analytical calculation of heading psi, curvature kappa, and first derivative of the curvature dkappa
+    on the basis of third order splines for x- and y-coordinate.
 
     .. inputs::
     :param coeffs_x:    coefficient matrix of the x splines with size (no_splines x 4).
@@ -27,23 +29,30 @@ def calc_head_curv_an(coeffs_x: np.ndarray,
     :type t_spls:       np.ndarray
     :param calc_curv:   bool flag to show if curvature should be calculated as well (kappa is set 0.0 otherwise).
     :type calc_curv:    bool
+    :param calc_dcurv:  bool flag to show if first derivative of curvature should be calculated as well.
+    :type calc_dcurv:   bool
 
     .. outputs::
     :return psi:        heading at every point.
     :rtype psi:         float
     :return kappa:      curvature at every point.
     :rtype kappa:       float
+    :return dkappa:     first derivative of curvature at every point (if calc_dcurv bool flag is True).
+    :rtype dkappa:      float
 
     .. notes::
-    len(ind_spls) = len(t_spls) = len(psi) = len(kappa)
+    len(ind_spls) = len(t_spls) = len(psi) = len(kappa) = len(dkappa)
     """
 
     # check inputs
     if coeffs_x.shape[0] != coeffs_y.shape[0]:
-        raise RuntimeError("Coefficient matrices must have the same length!")
+        raise ValueError("Coefficient matrices must have the same length!")
 
     if ind_spls.size != t_spls.size:
-        raise RuntimeError("ind_spls and t_spls must have the same length!")
+        raise ValueError("ind_spls and t_spls must have the same length!")
+
+    if not calc_curv and calc_dcurv:
+        raise ValueError("dkappa cannot be calculated without kappa!")
 
     # ------------------------------------------------------------------------------------------------------------------
     # CALCULATE HEADING ------------------------------------------------------------------------------------------------
@@ -80,7 +89,26 @@ def calc_head_curv_an(coeffs_x: np.ndarray,
     else:
         kappa = 0.0
 
-    return psi, kappa
+    # ------------------------------------------------------------------------------------------------------------------
+    # CALCULATE FIRST DERIVATIVE OF CURVATURE --------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------------------------------
+
+    if calc_dcurv:
+        # calculate required derivatives
+        x_ddd = 6 * coeffs_x[ind_spls, 3]
+
+        y_ddd = 6 * coeffs_y[ind_spls, 3]
+
+        # calculate first derivative of curvature dkappa
+        dkappa = ((np.power(x_d, 2) + np.power(y_d, 2)) * (x_d * y_ddd - y_d * x_ddd) -
+                  3 * (x_d * y_dd - y_d * x_dd) * (x_d * x_dd + y_d * y_dd)) / \
+                 np.power(np.power(x_d, 2) + np.power(y_d, 2), 3)
+
+        return psi, kappa, dkappa
+
+    else:
+
+        return psi, kappa
 
 
 # testing --------------------------------------------------------------------------------------------------------------
