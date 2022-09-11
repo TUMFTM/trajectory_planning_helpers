@@ -323,8 +323,22 @@ def __solver_fb_closed(p_ggv: np.ndarray,
         ay_max_global = mu_mean * np.amin(p_ggv[0, :, 2])   # get first lateral acceleration estimate
         vx_profile = np.sqrt(ay_max_global * radii)         # get first velocity estimate (radii must be positive!)
 
-        ay_max_curr = mu * np.interp(vx_profile, p_ggv[0, :, 0], p_ggv[0, :, 2])
-        vx_profile = np.sqrt(np.multiply(ay_max_curr, radii))
+        # iterate until the initial velocity profile converges (break after max. 100 iterations)
+        converged = False
+
+        for i in range(100):
+            vx_profile_prev_iteration = vx_profile
+
+            ay_max_curr = mu * np.interp(vx_profile, p_ggv[0, :, 0], p_ggv[0, :, 2])
+            vx_profile = np.sqrt(np.multiply(ay_max_curr, radii))
+
+            # break the loop if the maximum change of the velocity profile was below 0.5%
+            if np.max(np.abs(vx_profile / vx_profile_prev_iteration - 1.0)) < 0.005:
+                converged = True
+                break
+
+        if not converged:
+            print("The initial vx profile did not converge after 100 iterations, please check radii and ggv!")
 
     else:
         # in loc_gg mode all ggvs consist of a single line due to the missing velocity dependency, mu is None in this
